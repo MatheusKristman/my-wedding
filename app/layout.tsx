@@ -1,15 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Rouge_Script, Montserrat } from "next/font/google";
+import localFont from "next/font/local";
+
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const rougeScript = Rouge_Script({
   subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-rouge-script",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const montserrat = Montserrat({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-montserrat",
+});
+
+const fonde = localFont({
+  src: "../fonts/fonde.woff",
+  display: "swap",
+  variable: "--font-fonde",
 });
 
 export const metadata: Metadata = {
@@ -23,12 +35,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html
+      lang="pt-BR"
+      className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}
+    >
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
