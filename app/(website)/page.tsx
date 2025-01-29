@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="w-full px-6 mt-16 flex flex-col gap-12 sm:px-16 lg:container lg:mx-auto lg:flex-row-reverse">
+    <main className="w-full px-6 mt-16 flex flex-col gap-12 sm:px-16 lg:container lg:mx-auto lg:flex-row-reverse">
       <div className="w-full flex flex-col items-center gap-24 lg:items-end">
         <div className="w-full flex flex-col items-center gap-12 lg:items-end">
           <h1 className="font-fonde text-7xl text-center !leading-[80px] sm:text-8xl sm:max-w-sm sm:!leading-[110px] lg:text-right">
@@ -11,11 +11,13 @@ export default function Home() {
 
           <div className="w-full flex flex-col items-center gap-4 lg:items-end">
             <p className="font-rouge-script text-3xl text-center text-secondary lg:text-right lg:max-w-sm">
-              para que o povo veja e saiba, e todos vejam e saibam, que a mão do Senhor fez isso, que o Santo de Israel
-              o criou.
+              para que o povo veja e saiba, e todos vejam e saibam, que a mão do
+              Senhor fez isso, que o Santo de Israel o criou.
             </p>
 
-            <p className="font-rouge-script text-3xl text-center text-secondary">Isaías 41:20</p>
+            <p className="font-rouge-script text-3xl text-center text-secondary">
+              Isaías 41:20
+            </p>
           </div>
         </div>
 
@@ -53,6 +55,6 @@ export default function Home() {
           className="object-contain object-bottom hidden sm:block"
         />
       </div>
-    </div>
+    </main>
   );
 }
