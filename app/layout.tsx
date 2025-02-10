@@ -13,7 +13,7 @@ const rougeScript = Rouge_Script({
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   variable: "--font-montserrat",
 });
@@ -35,10 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}
-    >
+    <html lang="pt-BR" className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );

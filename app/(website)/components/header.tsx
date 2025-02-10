@@ -52,7 +52,7 @@ export function Header() {
         <Image src="/logo.svg" alt="M&G" fill className="object-contain object-center" />
       </Link>
 
-      <Button variant="outline" className="hidden font-normal sm:flex lg:text-xl lg:px-5 lg:py-3" asChild>
+      <Button variant="outline" className="hidden font-light sm:flex lg:text-xl lg:px-5 lg:py-2 lg:h-fit" asChild>
         <Link href="/confirmar-presenca">Presença</Link>
       </Button>
     </header>
