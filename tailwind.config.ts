@@ -9,6 +9,16 @@ export default {
   ],
   theme: {
     extend: {
+      keyframes: {
+        "arrow-right": {
+          "0%": { transform: "translateX(0px)" },
+          "50%": { transform: "translateX(20px)" },
+          "100%": { transform: "translateX(0px)" },
+        },
+      },
+      animation: {
+        "arrow-right": "arrow-right 2s ease-in-out infinite",
+      },
       fontFamily: {
         fonde: ["var(--font-fonde)"],
         montserrat: ["var(--font-montserrat)"],

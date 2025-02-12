@@ -143,15 +143,15 @@ export default function ConfirmPresencePage() {
 
       <div className="w-full px-6 flex flex-col gap-12 z-20 relative mb-12 sm:px-16 sm:max-w-[600px] sm:mx-auto sm:mb-24 lg:flex-row lg:max-w-[1350px] lg:justify-between">
         <div className="w-full flex flex-col gap-5 lg:w-[465px] lg:min-w-[465px]">
-          <div className="w-full relative ">
-            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl ">Confirme sua Presença</h1>
+          <div className="w-full relative">
+            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl">Confirme sua Presença</h1>
 
             <Image
               src="right-arrow.svg"
               alt="Seta"
               width={110}
               height={110}
-              className="object-contain object-center hidden sm:block absolute -bottom-6 right-8 animate-[indicate_1s_ease-in-out_infinite]"
+              className="object-contain object-center hidden lg:block absolute -bottom-6 right-8 animate-arrow-right"
             />
           </div>
 
