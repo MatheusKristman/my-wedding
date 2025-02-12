@@ -4,6 +4,8 @@ import localFont from "next/font/local";
 
 import "./globals.css";
 
+import TRPCProvider from "@/providers/trpc-provider";
+
 const rougeScript = Rouge_Script({
   subsets: ["latin"],
   weight: ["400"],
@@ -35,8 +37,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}>
-      <body className="antialiased">{children}</body>
+    <html
+      lang="pt-BR"
+      className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}
+    >
+      <body className="antialiased">
+        <TRPCProvider>{children}</TRPCProvider>
+      </body>
     </html>
   );
 }

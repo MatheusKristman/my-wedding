@@ -12,3 +12,19 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model Guest {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  attend        Boolean
+  adultQuantity Int
+  adultNames    String[]
+  kidsQuantity  Int
+  kidsNames     String[]
+  email         String
+  tel           String
+  message       String?
+  termsCheck    Boolean
+
+  createdAt DateTime @default(now())
+}

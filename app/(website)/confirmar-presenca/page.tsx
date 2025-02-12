@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import Image from "next/image";
+import { trpc } from "@/lib/trpc-client";
 
 const formSchema = z.object({
   name: z
@@ -26,15 +27,27 @@ const formSchema = z.object({
     required_error: "Você precisa selecionar uma das opções",
   }),
   adultQuantity: z.string().min(1, "É preciso ter ao menos 1 adulto"),
-  adultNames: z.array(
-    z.object({
-      value: z
-        .string()
-        .includes(" ", { message: "É preciso inserir o sobrenome" })
-        .min(6, "O nome precisa ter no mínimo 6 caracteres")
-        .max(100, "O nome só pode ter no máximo 100 caracteres"),
-    })
-  ),
+  adultNames: z
+    .array(
+      z.object({
+        value: z
+          .string()
+          .includes(" ", { message: "É preciso inserir o sobrenome" })
+          .min(6, "O nome precisa ter no mínimo 6 caracteres")
+          .max(100, "O nome só pode ter no máximo 100 caracteres"),
+      })
+    )
+    .refine(
+      (data) => {
+        const values = data.map((item) => item.value);
+        const uniqueValues = new Set(values);
+
+        return uniqueValues.size === values.length;
+      },
+      {
+        message: "Os nomes não podem ser repetidos",
+      }
+    ),
   kidsQuantity: z.string().optional(),
   kidsNames: z
     .array(
@@ -45,6 +58,17 @@ const formSchema = z.object({
           .min(6, "O nome precisa ter no mínimo 6 caracteres")
           .max(100, "O nome só pode ter no máximo 100 caracteres"),
       })
+    )
+    .refine(
+      (data) => {
+        const values = data.map((item) => item.value);
+        const uniqueValues = new Set(values);
+
+        return uniqueValues.size === values.length;
+      },
+      {
+        message: "Os nomes não podem ser repetidos",
+      }
     )
     .optional(),
   email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
@@ -72,6 +96,7 @@ export default function ConfirmPresencePage() {
 
   const adultQuantity = Number(form.watch("adultQuantity") || 1);
   const kidsQuantity = Number(form.watch("kidsQuantity") || 1);
+  const termsCheck = form.watch("termsCheck");
 
   const {
     fields: adultFields,
@@ -119,6 +144,19 @@ export default function ConfirmPresencePage() {
     }
   }, [kidsQuantity]);
 
+  useEffect(() => {
+    console.log({ errors: form.formState.errors });
+  }, [form.formState.errors]);
+
+  const { mutate: registerGuest, isPending } = trpc.guestRouter.registerGuest.useMutation({
+    onSuccess: () => {
+      console.log("Convidado cadastrado");
+    },
+    onError: (error) => {
+      console.log({ error });
+    },
+  });
+
   function handleTel(event: ChangeEvent<HTMLInputElement>) {
     let value = event.target.value.replace(/[^\d]/g, "");
 
@@ -128,7 +166,9 @@ export default function ConfirmPresencePage() {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ values });
+    if (termsCheck) {
+      registerGuest(values);
+    }
   }
 
   return (
@@ -138,13 +178,13 @@ export default function ConfirmPresencePage() {
         alt="Flores"
         width={200}
         height={500}
-        className="object-contain object-center absolute -top-10 -left-10 z-10"
+        className="object-contain object-center absolute -top-10 -left-10 z-10 lg:left-10"
       />
 
       <div className="w-full px-6 flex flex-col gap-12 z-20 relative mb-12 sm:px-16 sm:max-w-[600px] sm:mx-auto sm:mb-24 lg:flex-row lg:max-w-[1350px] lg:justify-between">
         <div className="w-full flex flex-col gap-5 lg:w-[465px] lg:min-w-[465px]">
           <div className="w-full relative">
-            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl">Confirme sua Presença</h1>
+            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">Confirme sua Presença</h1>
 
             <Image
               src="right-arrow.svg"
@@ -275,7 +315,9 @@ export default function ConfirmPresencePage() {
                           <Input placeholder="Insira o nome completo" className="dark-input w-full" {...field} />
                         </FormControl>
 
-                        <FormMessage />
+                        {form.formState.errors?.adultNames?.root?.message && (
+                          <FormMessage>{form.formState.errors.adultNames.root.message}</FormMessage>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -342,7 +384,9 @@ export default function ConfirmPresencePage() {
                           <Input placeholder="Insira o nome completo" className="dark-input w-full" {...field} />
                         </FormControl>
 
-                        <FormMessage />
+                        {form.formState.errors?.kidsNames?.root?.message && (
+                          <FormMessage>{form.formState.errors.kidsNames.root.message}</FormMessage>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -429,7 +473,7 @@ export default function ConfirmPresencePage() {
               />
             </div>
 
-            <Button variant="light" type="submit">
+            <Button variant="light" type="submit" disabled={!termsCheck || isPending}>
               Confirmar Presença
             </Button>
           </form>
