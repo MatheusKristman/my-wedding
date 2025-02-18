@@ -11,10 +11,24 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import Image from "next/image";
 import { trpc } from "@/lib/trpc-client";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z
@@ -35,7 +49,7 @@ const formSchema = z.object({
           .includes(" ", { message: "É preciso inserir o sobrenome" })
           .min(6, "O nome precisa ter no mínimo 6 caracteres")
           .max(100, "O nome só pode ter no máximo 100 caracteres"),
-      })
+      }),
     )
     .refine(
       (data) => {
@@ -46,7 +60,7 @@ const formSchema = z.object({
       },
       {
         message: "Os nomes não podem ser repetidos",
-      }
+      },
     ),
   kidsQuantity: z.string().optional(),
   kidsNames: z
@@ -57,7 +71,7 @@ const formSchema = z.object({
           .includes(" ", { message: "É preciso inserir o sobrenome" })
           .min(6, "O nome precisa ter no mínimo 6 caracteres")
           .max(100, "O nome só pode ter no máximo 100 caracteres"),
-      })
+      }),
     )
     .refine(
       (data) => {
@@ -68,11 +82,14 @@ const formSchema = z.object({
       },
       {
         message: "Os nomes não podem ser repetidos",
-      }
+      },
     )
     .optional(),
   email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
-  tel: z.string().min(1, "Telefone é obrigatório").length(15, "Telefone inválido"),
+  tel: z
+    .string()
+    .min(1, "Telefone é obrigatório")
+    .length(15, "Telefone inválido"),
   message: z.string(),
   termsCheck: z.boolean().default(false),
 });
@@ -97,6 +114,8 @@ export default function ConfirmPresencePage() {
   const adultQuantity = Number(form.watch("adultQuantity") || 1);
   const kidsQuantity = Number(form.watch("kidsQuantity") || 1);
   const termsCheck = form.watch("termsCheck");
+
+  const router = useRouter();
 
   const {
     fields: adultFields,
@@ -144,18 +163,16 @@ export default function ConfirmPresencePage() {
     }
   }, [kidsQuantity]);
 
-  useEffect(() => {
-    console.log({ errors: form.formState.errors });
-  }, [form.formState.errors]);
-
-  const { mutate: registerGuest, isPending } = trpc.guestRouter.registerGuest.useMutation({
-    onSuccess: () => {
-      console.log("Convidado cadastrado");
-    },
-    onError: (error) => {
-      console.log({ error });
-    },
-  });
+  const { mutate: registerGuest, isPending } =
+    trpc.guestRouter.registerGuest.useMutation({
+      onSuccess: () => {
+        // TODO: criar design da pagina de confirmação caso o usuário informar que não irá comparecer
+        router.push("/confirmar-presenca/confirmado");
+      },
+      onError: (error) => {
+        console.log({ error });
+      },
+    });
 
   function handleTel(event: ChangeEvent<HTMLInputElement>) {
     let value = event.target.value.replace(/[^\d]/g, "");
@@ -184,7 +201,9 @@ export default function ConfirmPresencePage() {
       <div className="w-full px-6 flex flex-col gap-12 z-20 relative mb-12 sm:px-16 sm:max-w-[600px] sm:mx-auto sm:mb-24 lg:flex-row lg:max-w-[1350px] lg:justify-between">
         <div className="w-full flex flex-col gap-5 lg:w-[465px] lg:min-w-[465px]">
           <div className="w-full relative">
-            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">Confirme sua Presença</h1>
+            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">
+              Confirme sua Presença
+            </h1>
 
             <Image
               src="right-arrow.svg"
@@ -209,10 +228,16 @@ export default function ConfirmPresencePage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">Nome Completo</FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">
+                      Nome Completo
+                    </FormLabel>
 
                     <FormControl>
-                      <Input placeholder="Insira o nome completo" className="dark-input w-full" {...field} />
+                      <Input
+                        placeholder="Insira o nome completo"
+                        className="dark-input w-full"
+                        {...field}
+                      />
                     </FormControl>
 
                     <FormMessage />
@@ -225,7 +250,9 @@ export default function ConfirmPresencePage() {
                 name="attend"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">Você irá ao evento?</FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">
+                      Você irá ao evento?
+                    </FormLabel>
 
                     <FormControl>
                       <RadioGroup
@@ -238,7 +265,9 @@ export default function ConfirmPresencePage() {
                             <RadioGroupItem value="yes" />
                           </FormControl>
 
-                          <FormLabel className="!mt-0.5 font-light text-base text-background">Sim</FormLabel>
+                          <FormLabel className="!mt-0.5 font-light text-base text-background">
+                            Sim
+                          </FormLabel>
                         </FormItem>
 
                         <FormItem className="flex items-center gap-2">
@@ -246,7 +275,9 @@ export default function ConfirmPresencePage() {
                             <RadioGroupItem value="no" />
                           </FormControl>
 
-                          <FormLabel className="!mt-0.5 font-light text-base text-background">Não</FormLabel>
+                          <FormLabel className="!mt-0.5 font-light text-base text-background">
+                            Não
+                          </FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -265,7 +296,10 @@ export default function ConfirmPresencePage() {
                       Quantidade de adultos (incluindo você)
                     </FormLabel>
 
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger className="bg-primary border-background text-background normal-case">
                           <SelectValue placeholder="Selecione a quantidade de adultos" />
@@ -312,11 +346,21 @@ export default function ConfirmPresencePage() {
                         </FormLabel>
 
                         <FormControl>
-                          <Input placeholder="Insira o nome completo" className="dark-input w-full" {...field} />
+                          <Input
+                            placeholder="Insira o nome completo"
+                            className="dark-input w-full"
+                            {...field}
+                          />
                         </FormControl>
 
-                        {form.formState.errors?.adultNames?.root?.message && (
-                          <FormMessage>{form.formState.errors.adultNames.root.message}</FormMessage>
+                        {form.formState.errors?.adultNames?.[index]?.value
+                          ?.message && (
+                          <FormMessage>
+                            {
+                              form.formState.errors?.adultNames?.[index]?.value
+                                ?.message
+                            }
+                          </FormMessage>
                         )}
                       </FormItem>
                     )}
@@ -332,7 +376,10 @@ export default function ConfirmPresencePage() {
                       Quantidade de crianças (0 - X anos)
                     </FormLabel>
 
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger className="bg-primary border-background text-background normal-case">
                           <SelectValue placeholder="Selecione a quantidade de crianças" />
@@ -381,11 +428,21 @@ export default function ConfirmPresencePage() {
                         </FormLabel>
 
                         <FormControl>
-                          <Input placeholder="Insira o nome completo" className="dark-input w-full" {...field} />
+                          <Input
+                            placeholder="Insira o nome completo"
+                            className="dark-input w-full"
+                            {...field}
+                          />
                         </FormControl>
 
-                        {form.formState.errors?.kidsNames?.root?.message && (
-                          <FormMessage>{form.formState.errors.kidsNames.root.message}</FormMessage>
+                        {form.formState.errors?.kidsNames?.[index]?.value
+                          ?.message && (
+                          <FormMessage>
+                            {
+                              form.formState.errors?.kidsNames?.[index]?.value
+                                ?.message
+                            }
+                          </FormMessage>
                         )}
                       </FormItem>
                     )}
@@ -396,10 +453,16 @@ export default function ConfirmPresencePage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">E-mail</FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">
+                      E-mail
+                    </FormLabel>
 
                     <FormControl>
-                      <Input placeholder="Insira o e-mail" className="dark-input w-full" {...field} />
+                      <Input
+                        placeholder="Insira o e-mail"
+                        className="dark-input w-full"
+                        {...field}
+                      />
                     </FormControl>
 
                     <FormMessage />
@@ -411,7 +474,9 @@ export default function ConfirmPresencePage() {
                 name="tel"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">Telefone para contato</FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">
+                      Telefone para contato
+                    </FormLabel>
 
                     <FormControl>
                       <Input
@@ -432,7 +497,9 @@ export default function ConfirmPresencePage() {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">Mensagem</FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">
+                      Mensagem
+                    </FormLabel>
 
                     <FormControl>
                       <Textarea
@@ -452,7 +519,10 @@ export default function ConfirmPresencePage() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start gap-2">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
 
                     <FormLabel className="!mt-0 leading-none text-sm text-background font-normal">
@@ -461,7 +531,10 @@ export default function ConfirmPresencePage() {
                         Termos de Uso
                       </Link>{" "}
                       e{" "}
-                      <Link href="/politica-de-privacidade" className="underline">
+                      <Link
+                        href="/politica-de-privacidade"
+                        className="underline"
+                      >
                         Política de Privacidade
                       </Link>
                       .
@@ -473,7 +546,11 @@ export default function ConfirmPresencePage() {
               />
             </div>
 
-            <Button variant="light" type="submit" disabled={!termsCheck || isPending}>
+            <Button
+              variant="light"
+              type="submit"
+              disabled={!termsCheck || isPending}
+            >
               Confirmar Presença
             </Button>
           </form>
