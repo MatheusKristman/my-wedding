@@ -11,27 +11,28 @@ interface MenuProps {
 export function Menu({ isMenuOpen, handleClose }: MenuProps) {
   const pathname = usePathname();
 
-  console.log({ pathname });
-
   return (
     <div
       className={cn(
         "w-screen h-screen bg-black/50 absolute top-0 left-0 right-0 bottom-0 hidden",
-        isMenuOpen && "z-10 motion-preset-fade motion-duration-300 block"
+        isMenuOpen && "z-30 motion-preset-fade motion-duration-300 block",
       )}
     >
       <div
         className={cn(
-          "w-full min-h-screen bg-accent px-6 pt-[calc(16px+40px+60px)] pb-4 absolute top-0 left-0 flex flex-col justify-between gap-16 sm:px-16 sm:min-h-fit sm:w-2/3 sm:pb-14 sm:max-w-lg lg:pt-[calc(16px+40px+60px+32px)]"
+          "w-full min-h-screen bg-accent px-6 pt-[calc(16px+40px+60px)] pb-4 absolute top-0 left-0 flex flex-col justify-between gap-16 sm:px-16 sm:min-h-fit sm:w-2/3 sm:pb-14 sm:max-w-lg lg:pt-[calc(16px+40px+60px+32px)]",
         )}
       >
         <ul className="flex flex-col gap-5">
           <li className="group" onClick={handleClose}>
-            <Link href="/" className="flex items-center gap-2 text-background font-montserrat uppercase text-xl">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-background font-montserrat uppercase text-xl"
+            >
               <div
                 className={cn(
                   "h-px bg-background w-0 transition-all group-hover:w-8",
-                  pathname === "/" && "w-8 group-hover:w-8"
+                  pathname === "/" && "w-8 group-hover:w-8",
                 )}
               />
               Início
@@ -46,7 +47,7 @@ export function Menu({ isMenuOpen, handleClose }: MenuProps) {
               <div
                 className={cn(
                   "h-px bg-background w-0 transition-all group-hover:w-8",
-                  pathname === "/historia-do-casal" && "w-8 group-hover:w-8"
+                  pathname === "/historia-do-casal" && "w-8 group-hover:w-8",
                 )}
               />
               História do Casal
@@ -61,7 +62,7 @@ export function Menu({ isMenuOpen, handleClose }: MenuProps) {
               <div
                 className={cn(
                   "h-px bg-background w-0 transition-all group-hover:w-8",
-                  pathname === "/data-e-local" && "w-8 group-hover:w-8"
+                  pathname === "/data-e-local" && "w-8 group-hover:w-8",
                 )}
               />
               Data e Local
@@ -76,7 +77,7 @@ export function Menu({ isMenuOpen, handleClose }: MenuProps) {
               <div
                 className={cn(
                   "h-px bg-background w-0 transition-all group-hover:w-8",
-                  pathname === "/lista-de-presentes" && "w-8 group-hover:w-8"
+                  pathname === "/lista-de-presentes" && "w-8 group-hover:w-8",
                 )}
               />
               Lista de Presentes

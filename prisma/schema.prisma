@@ -28,3 +28,10 @@ model Guest {
 
   createdAt DateTime @default(now())
 }
+
+model Gifts {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  price    Int
+  imageUrl String
+}
