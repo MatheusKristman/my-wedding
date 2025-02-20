@@ -7,20 +7,24 @@ export const giftsRouter = router({
     .input(
       z.object({
         page: z.number().nullish(),
-      }),
+        items: z.number(),
+      })
     )
     .query(async (opts) => {
-      const { page } = opts.input;
+      const { page, items } = opts.input;
 
-      const itemsPerPage: number = 9;
       const actualPage: number = page ?? 1;
-      const skip: number = (actualPage - 1) * itemsPerPage;
+      const skip: number = (actualPage - 1) * items;
 
       const gifts = await prisma.gifts.findMany({
         skip,
-        take: itemsPerPage,
+        take: items,
       });
 
-      return gifts;
+      const totalGifts = await prisma.gifts.count();
+
+      const pages = Math.ceil(totalGifts / items);
+
+      return { gifts, totalGifts, pages };
     }),
 });
