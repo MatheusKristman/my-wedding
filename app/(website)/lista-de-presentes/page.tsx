@@ -1,19 +1,22 @@
 "use client";
 
-import Image from "next/image";
 import { Gifts } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { ShoppingCartIcon } from "lucide-react";
-import { useWindowSize } from "@uidotdev/usehooks";
+import { useWindowSize, useSessionStorage } from "@uidotdev/usehooks";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CartDialog } from "./components/cart-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -21,15 +24,22 @@ import {
 } from "@/components/ui/pagination";
 
 import { trpc } from "@/lib/trpc-client";
-import { formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { GiftItem } from "./components/gift-item";
 
 export default function GiftsListPage() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [windowMode, setWindowMode] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [windowMode, setWindowMode] = useState<string>("");
+  const [itemsPerPage, setItemsPerPage] = useState<number>(8);
   const [gifts, setGifts] = useState<Gifts[]>([]);
-  const [totalPages, setTotalPages] = useState(0);
-  const [visiblePageButtons, setVisiblePageButtons] = useState(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [visiblePageButtons, setVisiblePageButtons] = useState<number>(0);
+  const [openCart, setOpenCart] = useState(false);
+
+  const [giftsSelected, setGiftsSelected] = useSessionStorage<string[]>(
+    "gifts",
+    [],
+  );
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -45,7 +55,6 @@ export default function GiftsListPage() {
 
   useEffect(() => {
     if (data) {
-      console.log("Dados atualizados");
       setGifts(data.gifts);
       setTotalPages(data.pages);
     }
@@ -83,7 +92,6 @@ export default function GiftsListPage() {
 
   useEffect(() => {
     if (windowMode === "Mobile") {
-      console.log({ windowMode });
       setItemsPerPage(3);
       setVisiblePageButtons(4);
       router.push("http://localhost:3000/lista-de-presentes?page=1");
@@ -92,7 +100,6 @@ export default function GiftsListPage() {
     }
 
     if (windowMode === "Tablet") {
-      console.log({ windowMode });
       setItemsPerPage(4);
       setVisiblePageButtons(6);
       router.push("http://localhost:3000/lista-de-presentes?page=1");
@@ -101,7 +108,6 @@ export default function GiftsListPage() {
     }
 
     if (windowMode === "Small Screen") {
-      console.log({ windowMode });
       setItemsPerPage(6);
       setVisiblePageButtons(12);
       router.push("http://localhost:3000/lista-de-presentes?page=1");
@@ -110,7 +116,6 @@ export default function GiftsListPage() {
     }
 
     if (windowMode === "Large Screen") {
-      console.log({ windowMode });
       setItemsPerPage(8);
       setVisiblePageButtons(12);
       router.push("http://localhost:3000/lista-de-presentes?page=1");
@@ -125,21 +130,28 @@ export default function GiftsListPage() {
     }
   }, [page]);
 
+  const handlePreviousButton = () => {
+    if (currentPage !== 1) {
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage - 1}`;
+    } else {
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage}`;
+    }
+  };
+
+  const handleNextButton = () => {
+    if (currentPage !== totalPages) {
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage + 1}`;
+    } else {
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage}`;
+    }
+  };
+
   const getPageButtons = () => {
     const buttons: number[] = [];
 
     if (data) {
       let startPage = Math.max(1, currentPage - halfVisible);
       let endPage = Math.min(totalPages, currentPage + halfVisible);
-
-      console.log({
-        startPage,
-        endPage,
-        currentPage,
-        halfVisible,
-        startPageCalc: currentPage - halfVisible,
-        endPageCalc: currentPage + halfVisible,
-      });
 
       if (endPage - startPage + 1 < visiblePageButtons) {
         if (startPage === 1) {
@@ -153,9 +165,6 @@ export default function GiftsListPage() {
         buttons.push(i);
       }
 
-      console.log({ buttons });
-      console.log({ visiblePageButtons });
-
       return buttons;
     } else {
       return buttons;
@@ -164,11 +173,13 @@ export default function GiftsListPage() {
 
   if (isLoading) {
     return (
-      <section className="w-full">
+      <section className="w-full mb-24">
         <div className="w-full flex items-center gap-2 mb-12">
           <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
 
-          <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">Lista de Presentes</h1>
+          <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">
+            Lista de Presentes
+          </h1>
 
           <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
         </div>
@@ -206,21 +217,25 @@ export default function GiftsListPage() {
   }
 
   return (
-    <section className="w-full">
+    <section className="w-full mb-24">
       <div className="w-full flex items-center gap-2 mb-12">
         <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
 
-        <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">Lista de Presentes</h1>
+        <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">
+          Lista de Presentes
+        </h1>
 
         <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
       </div>
 
       <div className="w-full px-6 flex items-center gap-5 mb-12 sm:px-16 sm:justify-between lg:container lg:mx-auto">
-        <Button size="lg" className="w-12 lg:w-fit">
-          <ShoppingCartIcon />
-
-          <span className="hidden lg:block uppercase">Carrinho Vazio</span>
-        </Button>
+        <CartDialog
+          width={windowSize.width}
+          openCart={openCart}
+          giftsSelected={giftsSelected}
+          setGiftsSelected={setGiftsSelected}
+          setOpenCart={setOpenCart}
+        />
 
         <Select>
           <SelectTrigger className="w-full sm:w-48 lg:w-60">
@@ -241,33 +256,16 @@ export default function GiftsListPage() {
           {/* Item do produto */}
           {gifts.length > 0
             ? gifts.map((gift) => (
-                <div key={gift.id} className="w-full flex flex-col">
-                  <div className="relative aspect-square w-full rounded-t-2xl overflow-hidden -mb-4">
-                    <Image src={gift.imageUrl} alt={gift.name} fill className="object-center object-cover" />
-                  </div>
-
-                  <div className="w-full bg-secondary p-6 flex flex-col items-center gap-5 rounded-2xl z-10">
-                    <div className="w-full flex flex-col items-center gap-2">
-                      <div className="w-full flex items-center gap-2">
-                        <div className="flex-1 h-px bg-white" />
-
-                        <span className="font-montserrat font-light uppercase text-lg text-center text-white">
-                          {gift.name}
-                        </span>
-
-                        <div className="flex-1 h-px bg-white" />
-                      </div>
-
-                      <span className="font-montserrat text-white text-3xl text-center">
-                        {formatPrice(gift.price / 100)}
-                      </span>
-                    </div>
-
-                    <Button size="lg" variant="light" className="w-full rounded-xl font-normal">
-                      Presentear
-                    </Button>
-                  </div>
-                </div>
+                <GiftItem
+                  key={gift.id}
+                  id={gift.id}
+                  imageUrl={gift.imageUrl}
+                  name={gift.name}
+                  price={gift.price}
+                  giftsSelected={giftsSelected}
+                  setOpenCart={setOpenCart}
+                  setGiftsSelected={setGiftsSelected}
+                />
               ))
             : null}
         </div>
@@ -276,13 +274,14 @@ export default function GiftsListPage() {
           <Pagination>
             <PaginationContent className="w-full flex justify-center">
               <PaginationItem>
-                <PaginationPrevious href="#" />
+                <PaginationPrevious
+                  href={handlePreviousButton()}
+                  className={cn({
+                    "opacity-50 pointer-events-none cursor-not-allowed":
+                      currentPage === 1,
+                  })}
+                />
               </PaginationItem>
-              {currentPage > halfVisible + 1 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
 
               {getPageButtons().map((pageNumber) => (
                 <PaginationItem key={pageNumber}>
@@ -295,38 +294,18 @@ export default function GiftsListPage() {
                 </PaginationItem>
               ))}
 
-              {currentPage < totalPages - halfVisible - 1 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-
               <PaginationItem>
-                <PaginationNext href="#" />
+                <PaginationNext
+                  href={handleNextButton()}
+                  className={cn({
+                    "opacity-50 pointer-events-none cursor-not-allowed":
+                      currentPage === totalPages,
+                  })}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         ) : null}
-
-        {/* <div className="w-full flex items-center justify-center gap-6 mb-24">
-          <Button size="lg" variant="outline" className="!h-12 w-12">
-            <ChevronLeftIcon strokeWidth={1} />
-          </Button>
-
-          <div className="flex items-center gap-6">
-            {data
-              ? Array.from({ length: data.pages }, (_, index) => (
-                  <Button key={index} size="lg" variant="outline" className="!h-12 w-12" asChild>
-                    <Link href={`http://localhost:3000/lista-de-presentes?page=${index + 1}`}>{index + 1}</Link>
-                  </Button>
-                ))
-              : null}
-          </div>
-
-          <Button size="lg" variant="outline" className="!h-12 w-12">
-            <ChevronRightIcon strokeWidth={1} />
-          </Button>
-        </div> */}
       </div>
     </section>
   );

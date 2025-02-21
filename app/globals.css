@@ -22,7 +22,7 @@ body {
     --muted-foreground: 240 3.8% 46.1%;
     --accent: 227 32% 29%;
     --accent-foreground: 45 16% 90%;
-    --destructive: 0 100% 65%;
+    --destructive: 0 100% 77%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 45 16% 90%;
@@ -73,4 +73,13 @@ body {
 
 .dark-input {
   @apply h-12 bg-primary border border-background rounded-none text-background font-montserrat placeholder:!text-background/40 focus-visible:!ring-0 focus-visible:!ring-offset-0;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
