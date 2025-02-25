@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rouge_Script, Montserrat } from "next/font/google";
 import localFont from "next/font/local";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import "./globals.css";
 
@@ -42,7 +43,9 @@ export default function RootLayout({
       className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}
     >
       <body className="antialiased">
-        <TRPCProvider>{children}</TRPCProvider>
+        <TRPCProvider>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </TRPCProvider>
       </body>
     </html>
   );

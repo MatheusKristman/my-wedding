@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
+import { Gifts } from "@prisma/client";
 
 export const giftsRouter = router({
   getGifts: publicProcedure
@@ -8,18 +9,55 @@ export const giftsRouter = router({
       z.object({
         page: z.number().nullish(),
         items: z.number(),
+        filter: z.string().min(1),
       }),
     )
     .query(async (opts) => {
-      const { page, items } = opts.input;
+      const { page, items, filter } = opts.input;
 
       const actualPage: number = page ?? 1;
       const skip: number = (actualPage - 1) * items;
+      let gifts: Gifts[] = [];
 
-      const gifts = await prisma.gifts.findMany({
-        skip,
-        take: items,
-      });
+      if (filter === "a_z") {
+        gifts = await prisma.gifts.findMany({
+          skip,
+          take: items,
+          orderBy: {
+            name: "asc",
+          },
+        });
+      }
+
+      if (filter === "desc_price") {
+        gifts = await prisma.gifts.findMany({
+          skip,
+          take: items,
+          orderBy: {
+            price: "desc",
+          },
+        });
+      }
+
+      if (filter === "asc_price") {
+        gifts = await prisma.gifts.findMany({
+          skip,
+          take: items,
+          orderBy: {
+            price: "asc",
+          },
+        });
+      }
+
+      if (filter === "favorites") {
+        gifts = await prisma.gifts.findMany({
+          skip,
+          take: items,
+          orderBy: {
+            favorite: "desc",
+          },
+        });
+      }
 
       const totalGifts = await prisma.gifts.count();
 

@@ -3,7 +3,7 @@
 import { Gifts } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useWindowSize, useSessionStorage } from "@uidotdev/usehooks";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { CartDialog } from "./components/cart-dialog";
@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { GiftItem } from "./components/gift-item";
 
 export default function GiftsListPage() {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [windowMode, setWindowMode] = useState<string>("");
   const [itemsPerPage, setItemsPerPage] = useState<number>(8);
   const [gifts, setGifts] = useState<Gifts[]>([]);
@@ -36,19 +36,20 @@ export default function GiftsListPage() {
   const [visiblePageButtons, setVisiblePageButtons] = useState<number>(0);
   const [openCart, setOpenCart] = useState(false);
 
+  const [page, setPage] = useQueryState("page");
+  const [filter, setFilter] = useQueryState("filter", { defaultValue: "a_z" });
+
   const [giftsSelected, setGiftsSelected] = useSessionStorage<string[]>(
     "gifts",
     [],
   );
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const page = searchParams.get("page");
   const windowSize = useWindowSize();
 
   const { data, refetch, isLoading } = trpc.giftsRouter.getGifts.useQuery({
     page: page ? Number(page) : 1,
     items: itemsPerPage,
+    filter: filter ?? "a_z",
   });
 
   const halfVisible = Math.floor(visiblePageButtons / 2);
@@ -94,7 +95,7 @@ export default function GiftsListPage() {
     if (windowMode === "Mobile") {
       setItemsPerPage(3);
       setVisiblePageButtons(4);
-      router.push("http://localhost:3000/lista-de-presentes?page=1");
+      setPage("1");
 
       refetch();
     }
@@ -102,7 +103,7 @@ export default function GiftsListPage() {
     if (windowMode === "Tablet") {
       setItemsPerPage(4);
       setVisiblePageButtons(6);
-      router.push("http://localhost:3000/lista-de-presentes?page=1");
+      setPage("1");
 
       refetch();
     }
@@ -110,7 +111,7 @@ export default function GiftsListPage() {
     if (windowMode === "Small Screen") {
       setItemsPerPage(6);
       setVisiblePageButtons(12);
-      router.push("http://localhost:3000/lista-de-presentes?page=1");
+      setPage("1");
 
       refetch();
     }
@@ -118,7 +119,7 @@ export default function GiftsListPage() {
     if (windowMode === "Large Screen") {
       setItemsPerPage(8);
       setVisiblePageButtons(12);
-      router.push("http://localhost:3000/lista-de-presentes?page=1");
+      setPage("1");
 
       refetch();
     }
@@ -132,17 +133,17 @@ export default function GiftsListPage() {
 
   const handlePreviousButton = () => {
     if (currentPage !== 1) {
-      return `http://localhost:3000/lista-de-presentes?page=${currentPage - 1}`;
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage - 1}&filter=${filter}`;
     } else {
-      return `http://localhost:3000/lista-de-presentes?page=${currentPage}`;
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage}&filter=${filter}`;
     }
   };
 
   const handleNextButton = () => {
     if (currentPage !== totalPages) {
-      return `http://localhost:3000/lista-de-presentes?page=${currentPage + 1}`;
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage + 1}&filter=${filter}`;
     } else {
-      return `http://localhost:3000/lista-de-presentes?page=${currentPage}`;
+      return `http://localhost:3000/lista-de-presentes?page=${currentPage}&filter=${filter}`;
     }
   };
 
@@ -237,15 +238,15 @@ export default function GiftsListPage() {
           setOpenCart={setOpenCart}
         />
 
-        <Select>
+        <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-full sm:w-48 lg:w-60">
             <SelectValue placeholder="Alterar a ordem" />
           </SelectTrigger>
 
           <SelectContent>
             <SelectItem value="a_z">A - Z</SelectItem>
-            <SelectItem value="asc">Maior preço</SelectItem>
-            <SelectItem value="desc">Menor preço</SelectItem>
+            <SelectItem value="desc_price">Maior preço</SelectItem>
+            <SelectItem value="asc_price">Menor preço</SelectItem>
             <SelectItem value="favorites">Favoritos dos noivos</SelectItem>
           </SelectContent>
         </Select>
@@ -287,7 +288,7 @@ export default function GiftsListPage() {
                 <PaginationItem key={pageNumber}>
                   <PaginationLink
                     isActive={pageNumber === Number(page)}
-                    href={`http://localhost:3000/lista-de-presentes?page=${pageNumber}`}
+                    href={`http://localhost:3000/lista-de-presentes?page=${pageNumber}&filter=${filter}`}
                   >
                     {pageNumber}
                   </PaginationLink>
