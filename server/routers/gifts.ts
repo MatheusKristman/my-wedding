@@ -19,6 +19,8 @@ export const giftsRouter = router({
       const skip: number = (actualPage - 1) * items;
       let gifts: Gifts[] = [];
 
+      console.log({ page, items, filter });
+
       if (filter === "a_z") {
         gifts = await prisma.gifts.findMany({
           skip,
