@@ -1,7 +1,7 @@
 "use client";
 
 import { Gifts } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useWindowSize, useSessionStorage } from "@uidotdev/usehooks";
 import { useQueryState } from "nuqs";
 
@@ -27,7 +27,7 @@ import { trpc } from "@/lib/trpc-client";
 import { cn } from "@/lib/utils";
 import { GiftItem } from "./components/gift-item";
 
-export default function GiftsListPage() {
+function GiftsList() {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [windowMode, setWindowMode] = useState<string>("");
   const [itemsPerPage, setItemsPerPage] = useState<number>(8);
@@ -309,5 +309,13 @@ export default function GiftsListPage() {
         ) : null}
       </div>
     </section>
+  );
+}
+
+export default function GiftsListPage() {
+  return (
+    <Suspense>
+      <GiftsList />
+    </Suspense>
   );
 }
