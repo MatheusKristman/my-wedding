@@ -22,7 +22,7 @@ export function Header() {
         variant="ghost"
         className={cn(
           "font-montserrat uppercase text-base text-foreground !px-0 lg:text-xl",
-          open && "z-20 !text-background"
+          open && "z-40 !text-background"
         )}
         onClick={handleOpen}
       >
