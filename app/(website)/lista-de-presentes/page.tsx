@@ -1,7 +1,7 @@
 "use client";
 
 import { Gifts } from "@prisma/client";
-import { Dispatch, SetStateAction, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useWindowSize, useSessionStorage } from "@uidotdev/usehooks";
 import { useQueryState } from "nuqs";
 
@@ -21,12 +21,7 @@ import {
 import { trpc } from "@/lib/trpc-client";
 import { cn } from "@/lib/utils";
 
-interface GiftsListProps {
-  giftsSelected: string[];
-  setGiftsSelected: Dispatch<SetStateAction<string[]>>;
-}
-
-function GiftsList({ giftsSelected, setGiftsSelected }: GiftsListProps) {
+export default function GiftsListPage() {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [windowMode, setWindowMode] = useState<string>("");
   const [itemsPerPage, setItemsPerPage] = useState<number>(8);
@@ -37,6 +32,8 @@ function GiftsList({ giftsSelected, setGiftsSelected }: GiftsListProps) {
 
   const [page, setPage] = useQueryState("page");
   const [filter, setFilter] = useQueryState("filter", { defaultValue: "a_z" });
+
+  const [giftsSelected, setGiftsSelected] = useSessionStorage<string[]>("gifts", []);
 
   const windowSize = useWindowSize();
 
@@ -210,102 +207,94 @@ function GiftsList({ giftsSelected, setGiftsSelected }: GiftsListProps) {
   }
 
   return (
-    <section className="w-full mb-24">
-      <div className="w-full flex items-center gap-2 mb-12">
-        <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
+    <Suspense>
+      <section className="w-full mb-24">
+        <div className="w-full flex items-center gap-2 mb-12">
+          <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
 
-        <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">Lista de Presentes</h1>
+          <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">Lista de Presentes</h1>
 
-        <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
-      </div>
-
-      <div className="w-full px-6 flex items-center gap-5 mb-12 sm:px-16 sm:justify-between lg:container lg:mx-auto">
-        <CartDialog
-          width={windowSize.width}
-          openCart={openCart}
-          giftsSelected={giftsSelected}
-          setGiftsSelected={setGiftsSelected}
-          setOpenCart={setOpenCart}
-        />
-
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-full sm:w-48 lg:w-60">
-            <SelectValue placeholder="Alterar a ordem" />
-          </SelectTrigger>
-
-          <SelectContent>
-            <SelectItem value="a_z">A - Z</SelectItem>
-            <SelectItem value="desc_price">Maior preço</SelectItem>
-            <SelectItem value="asc_price">Menor preço</SelectItem>
-            <SelectItem value="favorites">Favoritos dos noivos</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="w-full px-6 flex flex-col gap-24 sm:px-16 lg:container lg:mx-auto">
-        <div className="w-full grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {/* Item do produto */}
-          {gifts.length > 0
-            ? gifts.map((gift) => (
-                <GiftItem
-                  key={gift.id}
-                  id={gift.id}
-                  imageUrl={gift.imageUrl}
-                  name={gift.name}
-                  price={gift.price}
-                  giftsSelected={giftsSelected}
-                  setOpenCart={setOpenCart}
-                  setGiftsSelected={setGiftsSelected}
-                />
-              ))
-            : null}
+          <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
         </div>
 
-        {data ? (
-          <Pagination>
-            <PaginationContent className="w-full flex justify-center">
-              <PaginationItem>
-                <PaginationPrevious
-                  href={handlePreviousButton()}
-                  className={cn({
-                    "opacity-50 pointer-events-none cursor-not-allowed": currentPage === 1,
-                  })}
-                />
-              </PaginationItem>
+        <div className="w-full px-6 flex items-center gap-5 mb-12 sm:px-16 sm:justify-between lg:container lg:mx-auto">
+          <CartDialog
+            width={windowSize.width}
+            openCart={openCart}
+            giftsSelected={giftsSelected}
+            setGiftsSelected={setGiftsSelected}
+            setOpenCart={setOpenCart}
+          />
 
-              {getPageButtons().map((pageNumber) => (
-                <PaginationItem key={pageNumber}>
-                  <PaginationLink
-                    isActive={pageNumber === Number(page)}
-                    href={`http://localhost:3000/lista-de-presentes?page=${pageNumber}&filter=${filter}`}
-                  >
-                    {pageNumber}
-                  </PaginationLink>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-full sm:w-48 lg:w-60">
+              <SelectValue placeholder="Alterar a ordem" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="a_z">A - Z</SelectItem>
+              <SelectItem value="desc_price">Maior preço</SelectItem>
+              <SelectItem value="asc_price">Menor preço</SelectItem>
+              <SelectItem value="favorites">Favoritos dos noivos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="w-full px-6 flex flex-col gap-24 sm:px-16 lg:container lg:mx-auto">
+          <div className="w-full grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {/* Item do produto */}
+            {gifts.length > 0
+              ? gifts.map((gift) => (
+                  <GiftItem
+                    key={gift.id}
+                    id={gift.id}
+                    imageUrl={gift.imageUrl}
+                    name={gift.name}
+                    price={gift.price}
+                    giftsSelected={giftsSelected}
+                    setOpenCart={setOpenCart}
+                    setGiftsSelected={setGiftsSelected}
+                  />
+                ))
+              : null}
+          </div>
+
+          {data ? (
+            <Pagination>
+              <PaginationContent className="w-full flex justify-center">
+                <PaginationItem>
+                  <PaginationPrevious
+                    href={handlePreviousButton()}
+                    className={cn({
+                      "opacity-50 pointer-events-none cursor-not-allowed": currentPage === 1,
+                    })}
+                  />
                 </PaginationItem>
-              ))}
 
-              <PaginationItem>
-                <PaginationNext
-                  href={handleNextButton()}
-                  className={cn({
-                    "opacity-50 pointer-events-none cursor-not-allowed": currentPage === totalPages,
-                  })}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        ) : null}
-      </div>
-    </section>
-  );
-}
+                {getPageButtons().map((pageNumber) => (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      isActive={pageNumber === Number(page)}
+                      href={`http://localhost:3000/lista-de-presentes?page=${pageNumber}&filter=${filter}`}
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
 
-export default function GiftsListPage() {
-  const [giftsSelected, setGiftsSelected] = useSessionStorage<string[]>("gifts", []);
-
-  return (
-    <Suspense>
-      <GiftsList giftsSelected={giftsSelected} setGiftsSelected={setGiftsSelected} />
+                <PaginationItem>
+                  <PaginationNext
+                    href={handleNextButton()}
+                    className={cn({
+                      "opacity-50 pointer-events-none cursor-not-allowed": currentPage === totalPages,
+                    })}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          ) : null}
+        </div>
+      </section>
     </Suspense>
   );
 }
