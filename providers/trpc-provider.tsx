@@ -9,9 +9,7 @@ import { trpc } from "@/lib/trpc-client";
 
 export default function TRPCProvider({ children }: { children: React.ReactNode }) {
   function getBaseUrl() {
-    console.log(typeof window);
-
-    if (typeof window === "undefined") {
+    if (typeof window !== "undefined") {
       return "";
     }
 
