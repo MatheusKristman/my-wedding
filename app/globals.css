@@ -75,6 +75,10 @@ body {
   @apply h-12 bg-primary border border-background rounded-none text-background font-montserrat placeholder:!text-background/40 focus-visible:!ring-0 focus-visible:!ring-offset-0;
 }
 
+.outline-input {
+  @apply h-12 bg-transparent border border-primary/50 rounded-none text-primary font-montserrat transition placeholder:!text-primary/40 focus-visible:border-primary focus-visible:!ring-0 focus-visible:!ring-offset-0;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
