@@ -1,13 +1,31 @@
 import Image from "next/image";
-import { Dispatch, SetStateAction } from "react";
-import { Loader2, ShoppingCartIcon, Trash2 } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
+import {
+  Loader2,
+  ShoppingBagIcon,
+  ShoppingCartIcon,
+  Trash2,
+  WalletIcon,
+} from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 import { trpc } from "@/lib/trpc-client";
 import { cn, formatPrice } from "@/lib/utils";
@@ -20,7 +38,15 @@ interface CartDialogProps {
   setOpenCart: Dispatch<SetStateAction<boolean>>;
 }
 
-export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, setOpenCart }: CartDialogProps) {
+export function CartDialog({
+  width,
+  openCart,
+  giftsSelected,
+  setGiftsSelected,
+  setOpenCart,
+}: CartDialogProps) {
+  const [giftMethod, setGiftMethod] = useState("shop");
+
   const { data, refetch, isLoading } = trpc.giftsRouter.getCartGifts.useQuery({
     ids: giftsSelected,
   });
@@ -32,13 +58,13 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
     refetch();
   };
 
-  const totalPrice = data?.map((gift) => gift.price).reduce((acc, curr) => acc + curr, 0);
+  const totalPrice = data
+    ?.map((gift) => gift.price)
+    .reduce((acc, curr) => acc + curr, 0);
 
   if (width === null) {
     return;
   }
-
-  //TODO: adicionar form para prosseguir com a compra
 
   return width < 640 ? (
     <Drawer open={openCart} onOpenChange={setOpenCart}>
@@ -53,63 +79,140 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
           )}
 
           <span className="hidden lg:block uppercase">
-            {data && data.length > 0 ? (data.length === 1 ? "1 Item" : `${data.length} Items`) : "Carrinho Vazio"}
+            {data && data.length > 0
+              ? data.length === 1
+                ? "1 Item"
+                : `${data.length} Items`
+              : "Carrinho Vazio"}
           </span>
         </Button>
       </DrawerTrigger>
 
       <DrawerContent className="sm:rounded-none">
-        <DrawerHeader>
-          <DrawerTitle className="uppercase font-light text-2xl font-montserrat">Seu carrinho</DrawerTitle>
+        <DrawerHeader className="px-6 pt-6 pb-0">
+          <DrawerTitle className="uppercase font-light text-2xl text-left font-montserrat">
+            Seu carrinho
+          </DrawerTitle>
         </DrawerHeader>
 
         {isLoading ? (
-          <div className="w-full mt-12 mb-6 flex flex-col items-center justify-center gap-12">
+          <div className="w-full mt-6 mb-6 flex flex-col items-center justify-center gap-12">
             <Loader2 className="animate-spin size-12" strokeWidth={1.5} />
 
-            <Button onClick={() => setOpenCart(false)} size="lg" className="w-fit uppercase font-light text-base">
+            <Button
+              onClick={() => setOpenCart(false)}
+              size="lg"
+              className="w-fit uppercase font-light text-base"
+            >
               Fechar
             </Button>
           </div>
-        ) : data && data.length > 0 ? (
-          <div className="w-full p-7 flex flex-col items-center justify-center gap-12">
-            <ScrollArea className="max-h-[370px] h-full w-full overflow-y-auto">
-              <div className="w-full h-full flex flex-col gap-4">
-                {data.map((gift) => (
-                  <div key={gift.id} className="w-full flex">
-                    <div className="w-1/3 shrink-0 aspect-square relative">
-                      <Image src={gift.imageUrl} alt={gift.name} fill className="object-cover object-center" />
-                    </div>
-
-                    <div className="w-full p-6 bg-secondary flex flex-col justify-between gap-6">
-                      <div className="w-full flex flex-col gap-2">
-                        <div className="w-full flex items-center gap-2">
-                          <div className="w-8 h-px bg-background" />
-
-                          <h4 className="text-xl font-montserrat font-normal text-background uppercase line-clamp-1">
-                            {gift.name}
-                          </h4>
+        ) : data && totalPrice && data.length > 0 ? (
+          <div className="relative max-h-[80vh] overflow-y-auto w-full p-6 flex flex-col gap-12">
+            <div className="w-full flex flex-col gap-9">
+              <div className="w-full flex flex-col gap-9">
+                <ScrollArea className="max-h-[370px] h-full w-full overflow-y-auto">
+                  <div className="w-full h-full flex flex-col gap-4">
+                    {data.map((gift) => (
+                      <div key={gift.id} className="w-full flex">
+                        <div className="w-1/3 shrink-0 aspect-square relative">
+                          <Image
+                            src={gift.imageUrl}
+                            alt={gift.name}
+                            fill
+                            className="object-cover object-center"
+                          />
                         </div>
 
-                        <h2 className="text-4xl font-montserrat font-normal text-background">
-                          {formatPrice(gift.price / 100)}
-                        </h2>
+                        <div className="w-full p-6 bg-secondary flex flex-col justify-between gap-6">
+                          <div className="w-full flex flex-col gap-2">
+                            <div className="w-full flex items-center gap-2">
+                              <div className="w-8 h-px bg-background" />
+
+                              <h4 className="text-xl font-montserrat font-normal text-background uppercase line-clamp-1">
+                                {gift.name}
+                              </h4>
+                            </div>
+
+                            <h2 className="text-4xl font-montserrat font-normal text-background">
+                              {formatPrice(gift.price / 100)}
+                            </h2>
+                          </div>
+
+                          <Button
+                            onClick={() => removeGift(gift.id)}
+                            variant="ghost"
+                            className="w-fit h-fit p-0 flex items-center"
+                          >
+                            <Trash2 className="text-destructive" size={16} />
+
+                            <span className="text-base text-destructive uppercase">
+                              Remover
+                            </span>
+                          </Button>
+                        </div>
                       </div>
-
-                      <Button
-                        onClick={() => removeGift(gift.id)}
-                        variant="ghost"
-                        className="w-fit h-fit p-0 flex items-center"
-                      >
-                        <Trash2 className="text-destructive" size={16} />
-
-                        <span className="text-base text-destructive uppercase">Remover</span>
-                      </Button>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </ScrollArea>
+
+                <div className="w-full flex flex-col gap-4">
+                  <div className="w-full h-px bg-primary/35" />
+
+                  <div className="w-full flex items-center justify-between gap-6">
+                    <span className="font-montserrat text-xl font-light uppercase">
+                      Total
+                    </span>
+
+                    <span className="font-montserrat text-xl font-light uppercase">
+                      {formatPrice(totalPrice / 100)}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </ScrollArea>
+
+              <div className="w-full flex flex-col gap-8">
+                <div className="w-full flex flex-col gap-4">
+                  <span className="font-montserrat text-base uppercase">
+                    Forma de presentear
+                  </span>
+
+                  <div className="w-full flex items-center justify-between gap-6">
+                    <Button
+                      onClick={() => setGiftMethod("shop")}
+                      variant={giftMethod === "shop" ? "default" : "outline"}
+                      size="lg"
+                      className="w-1/2"
+                    >
+                      <ShoppingBagIcon strokeWidth={1} size={20} />
+                      Na loja
+                    </Button>
+
+                    <Button
+                      onClick={() => setGiftMethod("pix")}
+                      variant={giftMethod === "pix" ? "default" : "outline"}
+                      size="lg"
+                      className="w-1/2"
+                    >
+                      <WalletIcon strokeWidth={1} size={20} />
+                      PIX
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-4">
+                  <Input
+                    className="w-full outline-input text-base"
+                    placeholder="NOME"
+                  />
+
+                  <Textarea
+                    className="w-full outline-input resize-none !h-36 text-base"
+                    placeholder="DEIXE SUA MENSAGEM PARA OS NOIVOS"
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className="w-full grid grid-cols-1 gap-4">
               <Button
@@ -122,17 +225,23 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
               </Button>
 
               <Button size="lg" className="uppercase font-light text-base">
-                Continuar compra
+                Continuar
               </Button>
             </div>
           </div>
         ) : (
           <div className="w-full mt-12 mb-6 flex flex-col items-center justify-center gap-12">
             <div>
-              <span className="block w-full text-center uppercase text-xl text-primary/35">Carrinho vazio</span>
+              <span className="block w-full text-center uppercase text-xl text-primary/35">
+                Carrinho vazio
+              </span>
             </div>
 
-            <Button onClick={() => setOpenCart(false)} size="lg" className="w-fit uppercase font-light text-base">
+            <Button
+              onClick={() => setOpenCart(false)}
+              size="lg"
+              className="w-fit uppercase font-light text-base"
+            >
               Fechar
             </Button>
           </div>
@@ -152,35 +261,52 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
           )}
 
           <span className="hidden lg:block uppercase">
-            {data && data.length > 0 ? (data.length === 1 ? "1 Item" : `${data.length} Items`) : "Carrinho Vazio"}
+            {data && data.length > 0
+              ? data.length === 1
+                ? "1 Item"
+                : `${data.length} Items`
+              : "Carrinho Vazio"}
           </span>
         </Button>
       </DialogTrigger>
 
       <DialogContent
-        className={cn("sm:rounded-none !max-w-3xl", { "!max-w-xl": !data || !totalPrice || data.length === 0 })}
+        className={cn("sm:rounded-none !max-w-3xl", {
+          "!max-w-xl": !data || !totalPrice || data.length === 0,
+        })}
       >
         <DialogHeader>
-          <DialogTitle className="uppercase font-light text-2xl font-montserrat">Seu carrinho</DialogTitle>
+          <DialogTitle className="uppercase font-light text-2xl font-montserrat">
+            Seu carrinho
+          </DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
-          <div className="w-full mt-12 mb-6 flex flex-col items-center justify-center gap-12">
+          <div className="w-full my-6 flex flex-col items-center justify-center gap-12">
             <Loader2 className="animate-spin size-12" strokeWidth={1.5} />
 
-            <Button onClick={() => setOpenCart(false)} size="lg" className="w-fit uppercase font-light text-base">
+            <Button
+              onClick={() => setOpenCart(false)}
+              size="lg"
+              className="w-fit uppercase font-light text-base"
+            >
               Fechar
             </Button>
           </div>
         ) : data && totalPrice && data.length > 0 ? (
-          <div className="w-full mt-12 flex items-center justify-center gap-12">
+          <div className="w-full mt-6 flex items-center justify-center gap-12">
             <div className="w-1/2 h-full flex flex-col justify-between gap-12">
               <ScrollArea className="max-h-[370px] h-full w-full">
                 <div className="w-full h-full flex flex-col gap-4">
                   {data.map((gift) => (
                     <div key={gift.id} className="w-full flex">
                       <div className="w-1/3 shrink-0 aspect-square relative">
-                        <Image src={gift.imageUrl} alt={gift.name} fill className="object-cover object-center" />
+                        <Image
+                          src={gift.imageUrl}
+                          alt={gift.name}
+                          fill
+                          className="object-cover object-center"
+                        />
                       </div>
 
                       <div className="w-full p-6 bg-secondary flex flex-col justify-between gap-6">
@@ -205,7 +331,9 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
                         >
                           <Trash2 className="text-destructive" size={16} />
 
-                          <span className="text-base text-destructive uppercase">Remover</span>
+                          <span className="text-base text-destructive uppercase">
+                            Remover
+                          </span>
                         </Button>
                       </div>
                     </div>
@@ -217,17 +345,52 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
                 <div className="w-full h-px bg-primary/35" />
 
                 <div className="w-full flex items-center justify-between gap-6">
-                  <span className="font-montserrat text-xl font-light uppercase">Total</span>
+                  <span className="font-montserrat text-xl font-light uppercase">
+                    Total
+                  </span>
 
-                  <span className="font-montserrat text-xl font-light uppercase">{formatPrice(totalPrice / 100)}</span>
+                  <span className="font-montserrat text-xl font-light uppercase">
+                    {formatPrice(totalPrice / 100)}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="w-1/2 h-full flex flex-col justify-between gap-12">
-              <div className="w-full flex flex-col gap-9">
+              <div className="w-full flex flex-col gap-8">
                 <div className="w-full flex flex-col gap-4">
-                  <Input className="w-full outline-input text-base" placeholder="NOME" />
+                  <span className="font-montserrat text-base uppercase">
+                    Forma de presentear
+                  </span>
+
+                  <div className="w-full flex items-center justify-between gap-6">
+                    <Button
+                      onClick={() => setGiftMethod("shop")}
+                      variant={giftMethod === "shop" ? "default" : "outline"}
+                      size="lg"
+                      className="w-1/2"
+                    >
+                      <ShoppingBagIcon strokeWidth={1} size={20} />
+                      Na loja
+                    </Button>
+
+                    <Button
+                      onClick={() => setGiftMethod("pix")}
+                      variant={giftMethod === "pix" ? "default" : "outline"}
+                      size="lg"
+                      className="w-1/2"
+                    >
+                      <WalletIcon strokeWidth={1} size={20} />
+                      PIX
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-4">
+                  <Input
+                    className="w-full outline-input text-base"
+                    placeholder="NOME"
+                  />
 
                   <Textarea
                     className="w-full outline-input resize-none !h-36 text-base"
@@ -247,18 +410,24 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
                 </Button>
 
                 <Button size="lg" className="uppercase font-light text-base">
-                  Continuar compra
+                  Continuar
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="w-full mt-12 flex flex-col items-center justify-center gap-12">
+          <div className="w-full mt-6 flex flex-col items-center justify-center gap-12">
             <div>
-              <span className="block w-full text-center uppercase text-xl text-primary/35">Carrinho vazio</span>
+              <span className="block w-full text-center uppercase text-xl text-primary/35">
+                Carrinho vazio
+              </span>
             </div>
 
-            <Button onClick={() => setOpenCart(false)} size="lg" className="w-fit uppercase font-light text-base">
+            <Button
+              onClick={() => setOpenCart(false)}
+              size="lg"
+              className="w-fit uppercase font-light text-base"
+            >
               Fechar
             </Button>
           </div>
