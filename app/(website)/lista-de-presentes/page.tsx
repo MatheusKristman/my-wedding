@@ -8,7 +8,13 @@ import { useQueryState } from "nuqs";
 import { GiftItem } from "./components/gift-item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CartDialog } from "./components/cart-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Pagination,
   PaginationContent,
@@ -33,7 +39,10 @@ function GiftsList() {
   const [page, setPage] = useQueryState("page");
   const [filter, setFilter] = useQueryState("filter", { defaultValue: "a_z" });
 
-  const [giftsSelected, setGiftsSelected] = useSessionStorage<string[]>("gifts", []);
+  const [giftsSelected, setGiftsSelected] = useSessionStorage<string[]>(
+    "gifts",
+    [],
+  );
 
   const windowSize = useWindowSize();
 
@@ -169,7 +178,9 @@ function GiftsList() {
         <div className="w-full flex items-center gap-2 mb-12">
           <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
 
-          <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">Lista de Presentes</h1>
+          <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">
+            Lista de Presentes
+          </h1>
 
           <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
         </div>
@@ -211,7 +222,9 @@ function GiftsList() {
       <div className="w-full flex items-center gap-2 mb-12">
         <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
 
-        <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">Lista de Presentes</h1>
+        <h1 className="w-[80%] font-fonde text-5xl text-center sm:w-fit lg:text-7xl">
+          Lista de Presentes
+        </h1>
 
         <div className="w-[10%] flex-1 h-px bg-primary/15 sm:w-full" />
       </div>
@@ -265,7 +278,8 @@ function GiftsList() {
                 <PaginationPrevious
                   href={handlePreviousButton()}
                   className={cn({
-                    "opacity-50 pointer-events-none cursor-not-allowed": currentPage === 1,
+                    "opacity-50 pointer-events-none cursor-not-allowed":
+                      currentPage === 1,
                   })}
                 />
               </PaginationItem>
@@ -285,7 +299,8 @@ function GiftsList() {
                 <PaginationNext
                   href={handleNextButton()}
                   className={cn({
-                    "opacity-50 pointer-events-none cursor-not-allowed": currentPage === totalPages,
+                    "opacity-50 pointer-events-none cursor-not-allowed":
+                      currentPage === totalPages,
                   })}
                 />
               </PaginationItem>
