@@ -25,7 +25,7 @@ export const guestRouter = router({
               .includes(" ", { message: "É preciso inserir o sobrenome" })
               .min(6, "O nome precisa ter no mínimo 6 caracteres")
               .max(100, "O nome só pode ter no máximo 100 caracteres"),
-          })
+          }),
         ),
         kidsQuantity: z.string().optional(),
         kidsNames: z
@@ -36,20 +36,37 @@ export const guestRouter = router({
                 .includes(" ", { message: "É preciso inserir o sobrenome" })
                 .min(6, "O nome precisa ter no mínimo 6 caracteres")
                 .max(100, "O nome só pode ter no máximo 100 caracteres"),
-            })
+            }),
           )
           .optional(),
-        email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
-        tel: z.string().min(1, "Telefone é obrigatório").length(15, "Telefone inválido"),
+        email: z
+          .string()
+          .email("E-mail inválido")
+          .min(1, "E-mail é obrigatório"),
+        tel: z
+          .string()
+          .min(1, "Telefone é obrigatório")
+          .length(15, "Telefone inválido"),
         message: z.string(),
         termsCheck: z.boolean().default(false),
-      })
+      }),
     )
     .mutation(async (opts) => {
-      const { name, attend, adultQuantity, adultNames, kidsQuantity, kidsNames, email, tel, message, termsCheck } =
-        opts.input;
+      const {
+        name,
+        attend,
+        adultQuantity,
+        adultNames,
+        kidsQuantity,
+        kidsNames,
+        email,
+        tel,
+        message,
+        termsCheck,
+      } = opts.input;
 
-      const attendFormatted = attend === "yes" ? true : attend === "no" ? false : undefined;
+      const attendFormatted =
+        attend === "yes" ? true : attend === "no" ? false : undefined;
       const adultNamesFormatted = adultNames.map((item) => item.value);
       const kidsNamesFormatted = kidsNames?.map((item) => item.value);
 
@@ -75,6 +92,6 @@ export const guestRouter = router({
         },
       });
 
-      return {};
+      return { attend: attendFormatted };
     }),
 });

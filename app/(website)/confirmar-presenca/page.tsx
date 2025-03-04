@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import Link from "next/link";
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -95,6 +95,8 @@ const formSchema = z.object({
 });
 
 export default function ConfirmPresencePage() {
+  const [notPresent, setNotPresent] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -165,9 +167,13 @@ export default function ConfirmPresencePage() {
 
   const { mutate: registerGuest, isPending } =
     trpc.guestRouter.registerGuest.useMutation({
-      onSuccess: () => {
-        // TODO: criar design da pagina de confirmação caso o usuário informar que não irá comparecer
-        router.push("/confirmar-presenca/confirmado");
+      onSuccess: ({ attend }) => {
+        if (attend) {
+          router.push("/confirmar-presenca/confirmado");
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setNotPresent(true);
+        }
       },
       onError: (error) => {
         console.log({ error });
@@ -201,20 +207,35 @@ export default function ConfirmPresencePage() {
       <div className="w-full px-6 flex flex-col gap-12 z-20 relative mb-12 sm:px-16 sm:max-w-[600px] sm:mx-auto sm:mb-24 lg:flex-row lg:max-w-[1350px] lg:justify-between">
         <div className="w-full flex flex-col gap-5 lg:w-[465px] lg:min-w-[465px]">
           <div className="w-full relative">
-            <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">
-              Confirme sua Presença
-            </h1>
+            {notPresent ? (
+              <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">
+                Sentiremos sua Falta!
+              </h1>
+            ) : (
+              <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">
+                Confirme sua Presença
+              </h1>
+            )}
 
-            <Image
-              src="right-arrow.svg"
-              alt="Seta"
-              width={110}
-              height={110}
-              className="object-contain object-center hidden lg:block absolute -bottom-6 right-8 animate-arrow-right"
-            />
+            {!notPresent && (
+              <Image
+                src="right-arrow.svg"
+                alt="Seta"
+                width={110}
+                height={110}
+                className="object-contain object-center hidden lg:block absolute -bottom-6 right-8 animate-arrow-right"
+              />
+            )}
           </div>
 
           <div className="w-full h-px bg-primary" />
+
+          {notPresent && (
+            <p className="font-montserrat text-2xl font-light text-secondary">
+              Entendemos que nem sempre é possível estar presente, mas saiba que
+              sentiremos muito a sua falta nesse dia especial.
+            </p>
+          )}
         </div>
 
         <Form {...form}>
@@ -236,6 +257,7 @@ export default function ConfirmPresencePage() {
                       <Input
                         placeholder="Insira o nome completo"
                         className="dark-input w-full"
+                        disabled={notPresent}
                         {...field}
                       />
                     </FormControl>
@@ -259,6 +281,7 @@ export default function ConfirmPresencePage() {
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         className="flex items-center gap-4"
+                        disabled={notPresent}
                       >
                         <FormItem className="flex items-center gap-2">
                           <FormControl>
@@ -299,6 +322,7 @@ export default function ConfirmPresencePage() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={notPresent}
                     >
                       <FormControl>
                         <SelectTrigger className="bg-primary border-background text-background normal-case">
@@ -349,6 +373,7 @@ export default function ConfirmPresencePage() {
                           <Input
                             placeholder="Insira o nome completo"
                             className="dark-input w-full"
+                            disabled={notPresent}
                             {...field}
                           />
                         </FormControl>
@@ -379,6 +404,7 @@ export default function ConfirmPresencePage() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={notPresent}
                     >
                       <FormControl>
                         <SelectTrigger className="bg-primary border-background text-background normal-case">
@@ -431,6 +457,7 @@ export default function ConfirmPresencePage() {
                           <Input
                             placeholder="Insira o nome completo"
                             className="dark-input w-full"
+                            disabled={notPresent}
                             {...field}
                           />
                         </FormControl>
@@ -461,6 +488,7 @@ export default function ConfirmPresencePage() {
                       <Input
                         placeholder="Insira o e-mail"
                         className="dark-input w-full"
+                        disabled={notPresent}
                         {...field}
                       />
                     </FormControl>
@@ -483,6 +511,7 @@ export default function ConfirmPresencePage() {
                         placeholder="Insira o telefone"
                         className="dark-input w-full"
                         maxLength={15}
+                        disabled={notPresent}
                         {...field}
                         onChange={handleTel}
                       />
@@ -505,6 +534,7 @@ export default function ConfirmPresencePage() {
                       <Textarea
                         placeholder="Insira o telefone"
                         className="dark-input w-full !h-40 resize-none"
+                        disabled={notPresent}
                         {...field}
                       />
                     </FormControl>
@@ -522,6 +552,7 @@ export default function ConfirmPresencePage() {
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={notPresent}
                       />
                     </FormControl>
 
@@ -549,7 +580,7 @@ export default function ConfirmPresencePage() {
             <Button
               variant="light"
               type="submit"
-              disabled={!termsCheck || isPending}
+              disabled={!termsCheck || isPending || notPresent}
             >
               Confirmar Presença
             </Button>
