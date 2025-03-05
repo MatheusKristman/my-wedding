@@ -10,7 +10,7 @@ export const giftsRouter = router({
         page: z.number().nullish(),
         items: z.number(),
         filter: z.string().min(1),
-      }),
+      })
     )
     .query(async (opts) => {
       const { page, items, filter } = opts.input;
@@ -19,10 +19,13 @@ export const giftsRouter = router({
       const skip: number = (actualPage - 1) * items;
       let gifts: Gifts[] = [];
 
-      console.log({ page, items, filter });
-
       if (filter === "a_z") {
         gifts = await prisma.gifts.findMany({
+          where: {
+            stock: {
+              gt: 0,
+            },
+          },
           skip,
           take: items,
           orderBy: {
@@ -33,6 +36,11 @@ export const giftsRouter = router({
 
       if (filter === "desc_price") {
         gifts = await prisma.gifts.findMany({
+          where: {
+            stock: {
+              gt: 0,
+            },
+          },
           skip,
           take: items,
           orderBy: {
@@ -43,6 +51,11 @@ export const giftsRouter = router({
 
       if (filter === "asc_price") {
         gifts = await prisma.gifts.findMany({
+          where: {
+            stock: {
+              gt: 0,
+            },
+          },
           skip,
           take: items,
           orderBy: {
@@ -53,6 +66,11 @@ export const giftsRouter = router({
 
       if (filter === "favorites") {
         gifts = await prisma.gifts.findMany({
+          where: {
+            stock: {
+              gt: 0,
+            },
+          },
           skip,
           take: items,
           orderBy: {
@@ -71,7 +89,7 @@ export const giftsRouter = router({
     .input(
       z.object({
         ids: z.array(z.string().min(1)),
-      }),
+      })
     )
     .query(async (opts) => {
       const { ids } = opts.input;

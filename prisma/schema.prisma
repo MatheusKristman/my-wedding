@@ -35,4 +35,6 @@ model Gifts {
   price    Int
   imageUrl String
   favorite Boolean @default(false)
+  stock    Int     @default(0)
+  link     String?
 }
