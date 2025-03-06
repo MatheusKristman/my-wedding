@@ -1,17 +1,47 @@
+import Image from "next/image";
+import { toast } from "sonner";
+import { Gifts } from "@prisma/client";
+import { Loader2, MoveRight } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { formatPrice } from "@/lib/utils";
-import { Gifts } from "@prisma/client";
-import { MoveRight } from "lucide-react";
-import Image from "next/image";
-import { Dispatch, SetStateAction } from "react";
+import { trpc } from "@/lib/trpc-client";
 
 interface CartShopDesktop {
   gifts: Gifts[];
   setMethodSelected: Dispatch<SetStateAction<string>>;
+  handleReset: () => void;
 }
 
-export function CartShopDesktop({ gifts, setMethodSelected }: CartShopDesktop) {
+export function CartShopDesktop({ gifts, setMethodSelected, handleReset }: CartShopDesktop) {
+  const [productsAccessed, setProductsAccessed] = useState<string[]>([]);
+
+  const { mutate: handleShopSubmit, isPending } = trpc.giftsRouter.handleShopSubmit.useMutation({
+    onSuccess: () => {
+      toast.success("Obrigado por nos presentear!");
+
+      handleReset();
+    },
+    onError: (err) => {
+      toast.error("Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.");
+
+      console.error(err);
+    },
+  });
+
+  const handleLinkClick = (id: string) => {
+    const productArr = [...productsAccessed];
+
+    if (!productArr.includes(id)) {
+      productArr.push(id);
+
+      setProductsAccessed(productArr);
+    }
+  };
+
   return (
     <div className="w-full">
       <h4 className="font-montserrat text-xl font-light text-primary/50 uppercase mb-5">
@@ -41,8 +71,18 @@ export function CartShopDesktop({ gifts, setMethodSelected }: CartShopDesktop) {
                   </h2>
                 </div>
 
-                <Button variant="ghost" className="w-fit h-fit p-0 flex items-center" asChild>
-                  <a className="font-montserrat underline text-base text-background uppercase">
+                <Button
+                  variant="ghost"
+                  className="w-fit h-fit p-0 flex items-center"
+                  onClick={() => handleLinkClick(gift.id)}
+                  asChild
+                >
+                  <a
+                    href={gift.link}
+                    rel="noreferrer noopener"
+                    target="_blank"
+                    className="font-montserrat underline text-base text-background uppercase"
+                  >
                     <MoveRight className="text-background" size={16} />
                     Ir para loja
                   </a>
@@ -72,6 +112,7 @@ export function CartShopDesktop({ gifts, setMethodSelected }: CartShopDesktop) {
       <div className="w-full flex items-center justify-between gap-6">
         <Button
           onClick={() => setMethodSelected("")}
+          disabled={isPending}
           size="lg"
           variant="outline"
           className="w-full uppercase font-light text-base"
@@ -79,8 +120,14 @@ export function CartShopDesktop({ gifts, setMethodSelected }: CartShopDesktop) {
           Voltar
         </Button>
 
-        <Button size="lg" className="w-full uppercase font-light text-base">
-          Continuar
+        <Button
+          onClick={() => handleShopSubmit({ ids: productsAccessed })}
+          disabled={isPending || productsAccessed.length === 0}
+          size="lg"
+          className="w-full uppercase font-light text-base"
+        >
+          Presentear
+          {isPending && <Loader2 className="animate-spin size-4 mb-0.5" />}
         </Button>
       </div>
     </div>

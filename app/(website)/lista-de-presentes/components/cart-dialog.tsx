@@ -24,9 +24,17 @@ interface CartDialogProps {
   giftsSelected: string[];
   setGiftsSelected: Dispatch<SetStateAction<string[]>>;
   setOpenCart: Dispatch<SetStateAction<boolean>>;
+  handleGiftsRefetch: () => void;
 }
 
-export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, setOpenCart }: CartDialogProps) {
+export function CartDialog({
+  width,
+  openCart,
+  giftsSelected,
+  setGiftsSelected,
+  setOpenCart,
+  handleGiftsRefetch,
+}: CartDialogProps) {
   const [methodSelected, setMethodSelected] = useState("");
 
   const { data, refetch, isLoading } = trpc.giftsRouter.getCartGifts.useQuery({
@@ -40,6 +48,13 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
 
     setGiftsSelected(giftsFiltered);
     refetch();
+  };
+
+  const handleShopReset = () => {
+    setMethodSelected("");
+    setOpenCart(false);
+    setGiftsSelected([]);
+    handleGiftsRefetch();
   };
 
   if (width === null) {
@@ -125,7 +140,7 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, s
             {methodSelected === "pix" ? (
               <CartPixDesktop totalPrice={totalPrice} setMethodSelected={setMethodSelected} />
             ) : methodSelected === "shop" ? (
-              <CartShopDesktop gifts={data} setMethodSelected={setMethodSelected} />
+              <CartShopDesktop gifts={data} handleReset={handleShopReset} setMethodSelected={setMethodSelected} />
             ) : (
               <CartResumeDesktop
                 gifts={data}

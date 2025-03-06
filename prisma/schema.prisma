@@ -36,5 +36,5 @@ model Gifts {
   imageUrl String
   favorite Boolean @default(false)
   stock    Int     @default(0)
-  link     String?
+  link     String
 }

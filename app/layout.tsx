@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Rouge_Script, Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 
@@ -44,7 +45,10 @@ export default function RootLayout({
     >
       <body className="antialiased">
         <TRPCProvider>
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <Toaster richColors />
+            {children}
+          </NuqsAdapter>
         </TRPCProvider>
       </body>
     </html>

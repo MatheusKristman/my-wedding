@@ -10,7 +10,7 @@ export const giftsRouter = router({
         page: z.number().nullish(),
         items: z.number(),
         filter: z.string().min(1),
-      })
+      }),
     )
     .query(async (opts) => {
       const { page, items, filter } = opts.input;
@@ -89,7 +89,7 @@ export const giftsRouter = router({
     .input(
       z.object({
         ids: z.array(z.string().min(1)),
-      })
+      }),
     )
     .query(async (opts) => {
       const { ids } = opts.input;
@@ -103,5 +103,29 @@ export const giftsRouter = router({
       });
 
       return gifts;
+    }),
+  handleShopSubmit: publicProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string().min(1)),
+      }),
+    )
+    .mutation(async (opts) => {
+      const { ids } = opts.input;
+
+      await prisma.gifts.updateMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+        data: {
+          stock: {
+            decrement: 1,
+          },
+        },
+      });
+
+      return {};
     }),
 });
