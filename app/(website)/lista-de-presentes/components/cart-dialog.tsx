@@ -1,5 +1,6 @@
 import { ShoppingCartIcon } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 import { Button } from "@/components/ui/button";
 import { CartPixMobile } from "./cart-pix-mobile";
@@ -15,31 +16,20 @@ import { CartLoadingDesktop } from "./cart-loading-desktop";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
-import { trpc } from "@/lib/trpc-client";
 import { cn } from "@/lib/utils";
-import { useSessionStorage } from "@uidotdev/usehooks";
+import { trpc } from "@/lib/trpc-client";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartDialogProps {
   width: number | null;
   openCart: boolean;
   giftsSelected: string[];
   setGiftsSelected: Dispatch<SetStateAction<string[]>>;
-  setOpenCart: Dispatch<SetStateAction<boolean>>;
   handleGiftsRefetch: () => void;
 }
 
-export function CartDialog({
-  width,
-  openCart,
-  giftsSelected,
-  setGiftsSelected,
-  setOpenCart,
-  handleGiftsRefetch,
-}: CartDialogProps) {
-  const [name, setName] = useState("");
-  const [message, setMessage] = useState("");
-  const [giftMethod, setGiftMethod] = useState("shop");
-  const [methodSelected, setMethodSelected] = useState("");
+export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, handleGiftsRefetch }: CartDialogProps) {
+  const { methodSelected, setOpenCart, resetCartStore } = useCartStore();
 
   const [shopProductsAccessed, setShopProductsAccessed] = useSessionStorage<string[]>("productsAccessed", []);
 
@@ -48,6 +38,18 @@ export function CartDialog({
   });
 
   const totalPrice = data?.map((gift) => gift.price).reduce((acc, curr) => acc + curr, 0);
+
+  useEffect(() => {
+    const products = [...shopProductsAccessed];
+
+    for (let i = 0; i < shopProductsAccessed.length; i++) {
+      if (!giftsSelected.includes(shopProductsAccessed[i])) {
+        products.filter((product) => product !== shopProductsAccessed[i]);
+      }
+    }
+
+    setShopProductsAccessed(products);
+  }, []);
 
   const removeGift = (giftId: string) => {
     const giftsFiltered = giftsSelected.filter((id) => id !== giftId);
@@ -59,8 +61,7 @@ export function CartDialog({
   };
 
   const handleShopReset = () => {
-    setMethodSelected("");
-    setOpenCart(false);
+    resetCartStore();
     setGiftsSelected([]);
     handleGiftsRefetch();
   };
@@ -146,31 +147,20 @@ export function CartDialog({
         ) : data && totalPrice && data.length > 0 ? (
           <>
             {methodSelected === "pix" ? (
-              <CartPixDesktop totalPrice={totalPrice} setMethodSelected={setMethodSelected} />
+              <CartPixDesktop totalPrice={totalPrice} />
             ) : methodSelected === "shop" ? (
               <CartShopDesktop
                 gifts={data}
-                name={name}
-                message={message}
-                giftMethod={giftMethod}
                 shopProductsAccessed={shopProductsAccessed}
                 handleReset={handleShopReset}
-                setMethodSelected={setMethodSelected}
                 setShopProductsAccessed={setShopProductsAccessed}
               />
             ) : (
               <CartResumeDesktop
                 gifts={data}
                 totalPrice={totalPrice}
-                name={name}
-                message={message}
-                giftMethod={giftMethod}
                 removeGift={removeGift}
-                closeCart={() => setOpenCart(false)}
-                setMethodSelected={setMethodSelected}
-                setName={setName}
-                setMessage={setMessage}
-                setGiftMethod={setGiftMethod}
+                setShopProductsAccessed={setShopProductsAccessed}
               />
             )}
           </>

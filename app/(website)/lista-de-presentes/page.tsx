@@ -20,6 +20,7 @@ import {
 
 import { trpc } from "@/lib/trpc-client";
 import { cn } from "@/lib/utils";
+import { useCartStore } from "@/stores/use-cart-store";
 
 function GiftsList() {
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -28,7 +29,8 @@ function GiftsList() {
   const [gifts, setGifts] = useState<Gifts[]>([]);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [visiblePageButtons, setVisiblePageButtons] = useState<number>(0);
-  const [openCart, setOpenCart] = useState(false);
+
+  const { openCart } = useCartStore();
 
   const [page, setPage] = useQueryState("page");
   const [filter, setFilter] = useQueryState("filter", { defaultValue: "a_z" });
@@ -226,7 +228,6 @@ function GiftsList() {
           openCart={openCart}
           giftsSelected={giftsSelected}
           setGiftsSelected={setGiftsSelected}
-          setOpenCart={setOpenCart}
           handleGiftsRefetch={handleGiftsRefetch}
         />
 
@@ -256,7 +257,6 @@ function GiftsList() {
                   name={gift.name}
                   price={gift.price}
                   giftsSelected={giftsSelected}
-                  setOpenCart={setOpenCart}
                   setGiftsSelected={setGiftsSelected}
                 />
               ))

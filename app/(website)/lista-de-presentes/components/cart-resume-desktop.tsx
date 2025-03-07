@@ -9,41 +9,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { cn, formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartResumeDesktopProps {
   gifts: Gifts[];
   totalPrice: number;
-  name: string;
-  message: string;
-  giftMethod: string;
   removeGift: (id: string) => void;
-  closeCart: () => void;
-  setMethodSelected: Dispatch<SetStateAction<string>>;
-  setName: Dispatch<SetStateAction<string>>;
-  setMessage: Dispatch<SetStateAction<string>>;
-  setGiftMethod: Dispatch<SetStateAction<string>>;
+  setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
-export function CartResumeDesktop({
-  gifts,
-  totalPrice,
-  name,
-  message,
-  giftMethod,
-  removeGift,
-  closeCart,
-  setMethodSelected,
-  setName,
-  setMessage,
-  setGiftMethod,
-}: CartResumeDesktopProps) {
+export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProductsAccessed }: CartResumeDesktopProps) {
   const [error, setError] = useState({ name: "" });
+
+  const { name, message, giftMethod, setMethodSelected, setName, setMessage, setGiftMethod, setOpenCart } =
+    useCartStore();
 
   const handleClose = () => {
     setName("");
     setMessage("");
     setGiftMethod("shop");
-    closeCart();
+    setOpenCart(false);
   };
 
   const handleNext = () => {
@@ -66,7 +51,10 @@ export function CartResumeDesktop({
     }
 
     if (giftMethod === "pix") {
+      const giftCartIds = gifts.map((gift) => gift.id);
+
       setMethodSelected("pix");
+      setShopProductsAccessed(giftCartIds);
       return;
     }
 

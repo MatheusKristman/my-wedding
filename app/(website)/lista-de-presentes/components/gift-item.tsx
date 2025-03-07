@@ -4,6 +4,7 @@ import { Dispatch, memo, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 
 import { formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface GiftItemProps {
   id: string;
@@ -11,7 +12,6 @@ interface GiftItemProps {
   name: string;
   price: number;
   giftsSelected: string[];
-  setOpenCart: Dispatch<SetStateAction<boolean>>;
   setGiftsSelected: Dispatch<SetStateAction<string[]>>;
 }
 
@@ -21,9 +21,10 @@ export const GiftItem = memo(function GiftItem({
   name,
   price,
   giftsSelected,
-  setOpenCart,
   setGiftsSelected,
 }: GiftItemProps) {
+  const { setOpenCart } = useCartStore();
+
   const addGifts = (giftId: string) => {
     const gifts = [...giftsSelected];
 
@@ -38,12 +39,7 @@ export const GiftItem = memo(function GiftItem({
   return (
     <div className="w-full h-full flex flex-col">
       <div className="relative aspect-[9/11] w-full rounded-t-2xl overflow-hidden -mb-4">
-        <Image
-          src={imageUrl}
-          alt={name}
-          fill
-          className="object-center object-cover"
-        />
+        <Image src={imageUrl} alt={name} fill className="object-center object-cover" />
       </div>
 
       <div className="w-full flex-1 bg-secondary p-6 flex flex-col items-center justify-between gap-5 rounded-2xl z-10">
@@ -55,19 +51,12 @@ export const GiftItem = memo(function GiftItem({
           <div className="w-full flex items-center gap-2">
             <div className="flex-1 h-px bg-white" />
 
-            <span className="font-montserrat text-white text-3xl text-center">
-              {formatPrice(price / 100)}
-            </span>
+            <span className="font-montserrat text-white text-3xl text-center">{formatPrice(price / 100)}</span>
 
             <div className="flex-1 h-px bg-white" />
           </div>
 
-          <Button
-            onClick={() => addGifts(id)}
-            size="lg"
-            variant="light"
-            className="w-full rounded-xl font-normal"
-          >
+          <Button onClick={() => addGifts(id)} size="lg" variant="light" className="w-full rounded-xl font-normal">
             Presentear
           </Button>
         </div>

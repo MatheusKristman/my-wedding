@@ -1,18 +1,21 @@
-import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
 import { Copy } from "lucide-react";
 import { useQRCode } from "next-qrcode";
-import { Dispatch, SetStateAction } from "react";
+
+import { Button } from "@/components/ui/button";
+
+import { formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartPixDesktopProps {
   totalPrice: number;
-  setMethodSelected: Dispatch<SetStateAction<string>>;
 }
 
 // TODO: adicionar responsividade na altura
 
-export function CartPixDesktop({ totalPrice, setMethodSelected }: CartPixDesktopProps) {
+export function CartPixDesktop({ totalPrice }: CartPixDesktopProps) {
   const { Canvas } = useQRCode();
+
+  const { setMethodSelected } = useCartStore();
 
   return (
     <div className="w-full">

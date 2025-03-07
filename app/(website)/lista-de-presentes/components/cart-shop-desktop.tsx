@@ -9,28 +9,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { formatPrice } from "@/lib/utils";
 import { trpc } from "@/lib/trpc-client";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartShopDesktop {
   gifts: Gifts[];
-  name: string;
-  message: string;
-  giftMethod: string;
   shopProductsAccessed: string[];
-  setMethodSelected: Dispatch<SetStateAction<string>>;
   handleReset: () => void;
   setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
 export function CartShopDesktop({
   gifts,
-  name,
-  message,
-  giftMethod,
   shopProductsAccessed,
-  setMethodSelected,
   handleReset,
   setShopProductsAccessed,
 }: CartShopDesktop) {
+  const { name, message, giftMethod, setMethodSelected } = useCartStore();
+
   const { mutate: handleShopSubmit, isPending } = trpc.giftsRouter.handleShopSubmit.useMutation({
     onSuccess: () => {
       toast.success("Obrigado por nos presentear!");
@@ -142,7 +137,14 @@ export function CartShopDesktop({
         </Button>
 
         <Button
-          onClick={() => handleShopSubmit({ ids: shopProductsAccessed, name, message, giftMethod })}
+          onClick={() =>
+            handleShopSubmit({
+              ids: shopProductsAccessed,
+              name,
+              message,
+              giftMethod,
+            })
+          }
           disabled={isPending || shopProductsAccessed.length === 0}
           size="lg"
           className="w-full uppercase font-light text-base"
