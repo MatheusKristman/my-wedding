@@ -22,9 +22,9 @@ export function CartPixDesktop({
   handleReset,
   setShopProductsAccessed,
 }: CartPixDesktopProps) {
-  const { Canvas } = useQRCode();
-
   const { name, message, giftMethod, setMethodSelected } = useCartStore();
+
+  const { Canvas } = useQRCode();
 
   const { mutate: handleGiftSubmit, isPending } = trpc.giftsRouter.handleGiftSubmit.useMutation({
     onSuccess: () => {
@@ -69,14 +69,19 @@ export function CartPixDesktop({
       </div>
 
       <div className="w-full flex items-center justify-between gap-6">
-        <Button onClick={() => setMethodSelected("")} variant="outline" size="lg" className="w-full">
+        <Button
+          onClick={() => setMethodSelected("")}
+          variant="outline"
+          size="lg"
+          className="w-full uppercase font-light text-base"
+        >
           Voltar
         </Button>
 
         <Button
           onClick={() => handleGiftSubmit({ name, message, giftMethod, ids: shopProductsAccessed })}
           size="lg"
-          className="w-full"
+          className="w-full uppercase font-light text-base"
         >
           Presentear
           {isPending && <Loader2 className="animate-spin size-4 mb-0.5" />}

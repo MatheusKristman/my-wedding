@@ -165,12 +165,12 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
         </div>
 
         <div className="w-full grid grid-rows-2 gap-4">
-          <Button onClick={handleClose} size="lg" variant="outline" className="uppercase font-light text-base">
-            Adicionar mais itens
-          </Button>
-
           <Button onClick={handleNext} size="lg" className="uppercase font-light text-base">
             Continuar
+          </Button>
+
+          <Button onClick={handleClose} size="lg" variant="outline" className="uppercase font-light text-base">
+            Adicionar mais itens
           </Button>
         </div>
       </div>

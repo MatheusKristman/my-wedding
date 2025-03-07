@@ -1,19 +1,47 @@
-import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
-import { Copy } from "lucide-react";
+import { toast } from "sonner";
 import { useQRCode } from "next-qrcode";
+import { Copy, Loader2 } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
+
+import { Button } from "@/components/ui/button";
+
+import { trpc } from "@/lib/trpc-client";
+import { formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartPixMobileProps {
   totalPrice: number;
+  shopProductsAccessed: string[];
+  handleReset: () => void;
+  setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
-// TODO: adicionar responsividade na altura
+export function CartPixMobile({
+  totalPrice,
+  shopProductsAccessed,
+  handleReset,
+  setShopProductsAccessed,
+}: CartPixMobileProps) {
+  const { name, message, giftMethod, setMethodSelected } = useCartStore();
 
-export function CartPixMobile({ totalPrice }: CartPixMobileProps) {
   const { Canvas } = useQRCode();
 
+  const { mutate: handleGiftSubmit, isPending } = trpc.giftsRouter.handleGiftSubmit.useMutation({
+    onSuccess: () => {
+      toast.success("Obrigado por nos presentear!");
+
+      handleReset();
+      setShopProductsAccessed([]);
+    },
+    onError: (err) => {
+      toast.error("Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.");
+
+      console.error(err);
+    },
+  });
+
   return (
-    <div className="w-full px-6 pt-5 pb-8">
+    <div className="relative max-h-[80vh] overflow-y-auto w-full px-6 pt-5 pb-8">
       <h4 className="font-montserrat text-xl font-light text-primary/50 uppercase mb-9">
         Faça o pix na opção que achar melhor
       </h4>
@@ -40,13 +68,23 @@ export function CartPixMobile({ totalPrice }: CartPixMobileProps) {
         </span>
       </div>
 
-      <div className="w-full flex flex-col-reverse gap-6">
-        <Button variant="outline" size="lg" className="w-full">
-          Voltar
+      <div className="w-full flex flex-col gap-6">
+        <Button
+          onClick={() => handleGiftSubmit({ name, message, giftMethod, ids: shopProductsAccessed })}
+          size="lg"
+          className="w-full uppercase font-light text-base"
+        >
+          Presentear
+          {isPending && <Loader2 className="animate-spin size-4 mb-0.5" />}
         </Button>
 
-        <Button size="lg" className="w-full">
-          Presentear
+        <Button
+          onClick={() => setMethodSelected("")}
+          variant="outline"
+          size="lg"
+          className="w-full uppercase font-light text-base"
+        >
+          Voltar
         </Button>
       </div>
     </div>

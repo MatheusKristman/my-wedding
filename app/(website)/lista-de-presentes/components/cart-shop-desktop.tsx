@@ -84,9 +84,9 @@ export function CartShopDesktop({
                 </div>
 
                 <Button
+                  onClick={() => handleLinkClick(gift.id)}
                   variant="ghost"
                   className="w-fit h-fit p-0 flex items-center"
-                  onClick={() => handleLinkClick(gift.id)}
                   asChild
                 >
                   <a

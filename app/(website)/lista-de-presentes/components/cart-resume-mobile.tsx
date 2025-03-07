@@ -1,23 +1,65 @@
 import Image from "next/image";
-
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Gifts } from "@prisma/client";
-import { formatPrice } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Dispatch, SetStateAction, useState } from "react";
 import { ShoppingBagIcon, Trash2, WalletIcon } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { cn, formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartResumeMobileProps {
   gifts: Gifts[];
   totalPrice: number;
   removeGift: (id: string) => void;
-  closeCart: () => void;
+  setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
-export function CartResumeMobile({ gifts, removeGift, closeCart, totalPrice }: CartResumeMobileProps) {
-  const [giftMethod, setGiftMethod] = useState("shop");
+export function CartResumeMobile({ gifts, totalPrice, removeGift, setShopProductsAccessed }: CartResumeMobileProps) {
+  const [error, setError] = useState({ name: "" });
+
+  const { name, message, giftMethod, setMethodSelected, setName, setMessage, setGiftMethod, setOpenCart } =
+    useCartStore();
+
+  const handleClose = () => {
+    setName("");
+    setMessage("");
+    setGiftMethod("shop");
+    setOpenCart(false);
+  };
+
+  const handleNext = () => {
+    let hasError = false;
+
+    if (name === "") {
+      hasError = true;
+      setError({ name: "Nome é obrigatório" });
+    }
+
+    if (hasError) {
+      return;
+    } else {
+      setError({ name: "" });
+    }
+
+    if (giftMethod === "shop") {
+      setMethodSelected("shop");
+      return;
+    }
+
+    if (giftMethod === "pix") {
+      const giftCartIds = gifts.map((gift) => gift.id);
+
+      setMethodSelected("pix");
+      setShopProductsAccessed(giftCartIds);
+      return;
+    }
+
+    console.error("Erro no método handleNext");
+  };
 
   return (
     <div className="relative max-h-[80vh] overflow-y-auto w-full p-6 flex flex-col gap-12">
@@ -100,9 +142,22 @@ export function CartResumeMobile({ gifts, removeGift, closeCart, totalPrice }: C
           </div>
 
           <div className="w-full flex flex-col gap-4">
-            <Input className="w-full outline-input text-base" placeholder="NOME" />
+            <div className="w-full flex flex-col gap-1">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={cn("w-full outline-input text-base", {
+                  "!border-destructive/50 focus-visible:!border-destructive": error.name !== "",
+                })}
+                placeholder="NOME"
+              />
+
+              {error.name && <span className="font-montserrat text-sm text-destructive">{error.name}</span>}
+            </div>
 
             <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               className="w-full outline-input resize-none !h-36 text-base"
               placeholder="DEIXE SUA MENSAGEM PARA OS NOIVOS"
             />
@@ -111,12 +166,12 @@ export function CartResumeMobile({ gifts, removeGift, closeCart, totalPrice }: C
       </div>
 
       <div className="w-full grid grid-cols-1 gap-4">
-        <Button onClick={closeCart} size="lg" variant="outline" className="uppercase font-light text-base">
-          Adicionar mais itens
+        <Button onClick={handleNext} size="lg" className="uppercase font-light text-base">
+          Continuar
         </Button>
 
-        <Button size="lg" className="uppercase font-light text-base">
-          Continuar
+        <Button onClick={handleClose} size="lg" variant="outline" className="uppercase font-light text-base">
+          Adicionar mais itens
         </Button>
       </div>
     </div>

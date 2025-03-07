@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { publicProcedure, router } from "../trpc";
 import { z } from "zod";
 import { Gifts } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const giftsRouter = router({
   getGifts: publicProcedure
@@ -116,6 +117,33 @@ export const giftsRouter = router({
     .mutation(async (opts) => {
       const { ids, name, message, giftMethod } = opts.input;
 
+      const giftWithoutStock = await prisma.gifts.findMany({
+        where: {
+          id: {
+            in: ids,
+          },
+          stock: {
+            equals: 0,
+          },
+        },
+      });
+
+      if (giftWithoutStock.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Um dos items selecionados já foram comprados, recarregue a pagina para ter a lista atualizada!",
+        });
+      }
+
+      const purchaseCreated = await prisma.purchase.create({
+        data: {
+          name,
+          message,
+          giftMethod,
+          giftsIds: ids,
+        },
+      });
+
       await prisma.gifts.updateMany({
         where: {
           id: {
@@ -126,15 +154,9 @@ export const giftsRouter = router({
           stock: {
             decrement: 1,
           },
-        },
-      });
-
-      await prisma.purchase.create({
-        data: {
-          name,
-          message,
-          giftMethod,
-          giftsIds: ids,
+          purchasesIds: {
+            push: purchaseCreated.id,
+          },
         },
       });
 

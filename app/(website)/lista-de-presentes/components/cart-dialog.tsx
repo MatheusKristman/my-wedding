@@ -98,15 +98,25 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, h
         ) : data && totalPrice && data.length > 0 ? (
           <>
             {methodSelected === "pix" ? (
-              <CartPixMobile totalPrice={totalPrice} />
+              <CartPixMobile
+                totalPrice={totalPrice}
+                shopProductsAccessed={shopProductsAccessed}
+                handleReset={handleShopReset}
+                setShopProductsAccessed={setShopProductsAccessed}
+              />
             ) : methodSelected === "shop" ? (
-              <CartShopMobile gifts={data} />
+              <CartShopMobile
+                gifts={data}
+                shopProductsAccessed={shopProductsAccessed}
+                handleReset={handleShopReset}
+                setShopProductsAccessed={setShopProductsAccessed}
+              />
             ) : (
               <CartResumeMobile
                 gifts={data}
-                removeGift={removeGift}
-                closeCart={() => setOpenCart(false)}
                 totalPrice={totalPrice}
+                removeGift={removeGift}
+                setShopProductsAccessed={setShopProductsAccessed}
               />
             )}
           </>
