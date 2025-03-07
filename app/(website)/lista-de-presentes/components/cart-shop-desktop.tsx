@@ -2,7 +2,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { Gifts } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
-import { Loader2, MoveRight } from "lucide-react";
+import { Check, Loader2, MoveRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -65,6 +65,12 @@ export function CartShopDesktop({
           {gifts.map((gift) => (
             <div key={gift.id} className="w-full flex">
               <div className="w-1/3 shrink-0 aspect-square relative">
+                {shopProductsAccessed.includes(gift.id) && (
+                  <div className="absolute top-2 left-2 rounded-full size-10 bg-background flex items-center justify-center z-10">
+                    <Check size={30} />
+                  </div>
+                )}
+
                 <Image src={gift.imageUrl} alt={gift.name} fill className="object-cover object-center" />
               </div>
 
