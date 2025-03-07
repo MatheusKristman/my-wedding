@@ -9,21 +9,35 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { formatPrice } from "@/lib/utils";
 import { trpc } from "@/lib/trpc-client";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 interface CartShopDesktop {
   gifts: Gifts[];
+  name: string;
+  message: string;
+  giftMethod: string;
+  shopProductsAccessed: string[];
   setMethodSelected: Dispatch<SetStateAction<string>>;
   handleReset: () => void;
+  setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
-export function CartShopDesktop({ gifts, setMethodSelected, handleReset }: CartShopDesktop) {
-  const [productsAccessed, setProductsAccessed] = useState<string[]>([]);
-
+export function CartShopDesktop({
+  gifts,
+  name,
+  message,
+  giftMethod,
+  shopProductsAccessed,
+  setMethodSelected,
+  handleReset,
+  setShopProductsAccessed,
+}: CartShopDesktop) {
   const { mutate: handleShopSubmit, isPending } = trpc.giftsRouter.handleShopSubmit.useMutation({
     onSuccess: () => {
       toast.success("Obrigado por nos presentear!");
 
       handleReset();
+      setShopProductsAccessed([]);
     },
     onError: (err) => {
       toast.error("Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.");
@@ -32,20 +46,24 @@ export function CartShopDesktop({ gifts, setMethodSelected, handleReset }: CartS
     },
   });
 
+  const handleBack = () => {
+    setMethodSelected("");
+  };
+
   const handleLinkClick = (id: string) => {
-    const productArr = [...productsAccessed];
+    const productArr = [...shopProductsAccessed];
 
     if (!productArr.includes(id)) {
       productArr.push(id);
 
-      setProductsAccessed(productArr);
+      setShopProductsAccessed(productArr);
     }
   };
 
   return (
     <div className="w-full">
       <h4 className="font-montserrat text-xl font-light text-primary/50 uppercase mb-5">
-        Clique na opção &quot;ir para loja&quot; para acessar a loja
+        Clique na opção &quot;ir para loja&quot; para comprar o presente
       </h4>
 
       <ScrollArea className="max-h-[170px] w-full overflow-y-auto mb-9">
@@ -93,7 +111,7 @@ export function CartShopDesktop({ gifts, setMethodSelected, handleReset }: CartS
         </div>
       </ScrollArea>
 
-      <div className="w-full border border-primary p-5 mb-16">
+      <div className="w-full border border-primary p-5 mb-10">
         <h5 className="font-montserrat text-xl text-primary font-light uppercase mb-2">Dados de envio</h5>
 
         <div className="flex flex-col gap-1">
@@ -109,9 +127,13 @@ export function CartShopDesktop({ gifts, setMethodSelected, handleReset }: CartS
         </div>
       </div>
 
+      <span className="block w-full font-montserrat text-center text-sm text-primary/50 mb-4">
+        Entre em contato com um dos noivos para informar sobre a compra!
+      </span>
+
       <div className="w-full flex items-center justify-between gap-6">
         <Button
-          onClick={() => setMethodSelected("")}
+          onClick={handleBack}
           disabled={isPending}
           size="lg"
           variant="outline"
@@ -121,8 +143,8 @@ export function CartShopDesktop({ gifts, setMethodSelected, handleReset }: CartS
         </Button>
 
         <Button
-          onClick={() => handleShopSubmit({ ids: productsAccessed })}
-          disabled={isPending || productsAccessed.length === 0}
+          onClick={() => handleShopSubmit({ ids: shopProductsAccessed, name, message, giftMethod })}
+          disabled={isPending || shopProductsAccessed.length === 0}
           size="lg"
           className="w-full uppercase font-light text-base"
         >

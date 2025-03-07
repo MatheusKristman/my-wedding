@@ -13,22 +13,38 @@ import { cn, formatPrice } from "@/lib/utils";
 interface CartResumeDesktopProps {
   gifts: Gifts[];
   totalPrice: number;
+  name: string;
+  message: string;
+  giftMethod: string;
   removeGift: (id: string) => void;
   closeCart: () => void;
   setMethodSelected: Dispatch<SetStateAction<string>>;
+  setName: Dispatch<SetStateAction<string>>;
+  setMessage: Dispatch<SetStateAction<string>>;
+  setGiftMethod: Dispatch<SetStateAction<string>>;
 }
 
 export function CartResumeDesktop({
   gifts,
   totalPrice,
+  name,
+  message,
+  giftMethod,
   removeGift,
   closeCart,
   setMethodSelected,
+  setName,
+  setMessage,
+  setGiftMethod,
 }: CartResumeDesktopProps) {
-  const [giftMethod, setGiftMethod] = useState("shop");
-  const [name, setName] = useState("");
-  const [message, setMessage] = useState("");
   const [error, setError] = useState({ name: "" });
+
+  const handleClose = () => {
+    setName("");
+    setMessage("");
+    setGiftMethod("shop");
+    closeCart();
+  };
 
   const handleNext = () => {
     let hasError = false;
@@ -161,7 +177,7 @@ export function CartResumeDesktop({
         </div>
 
         <div className="w-full grid grid-rows-2 gap-4">
-          <Button onClick={closeCart} size="lg" variant="outline" className="uppercase font-light text-base">
+          <Button onClick={handleClose} size="lg" variant="outline" className="uppercase font-light text-base">
             Adicionar mais itens
           </Button>
 

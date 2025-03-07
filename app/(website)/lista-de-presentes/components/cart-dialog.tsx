@@ -17,6 +17,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from 
 
 import { trpc } from "@/lib/trpc-client";
 import { cn } from "@/lib/utils";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 interface CartDialogProps {
   width: number | null;
@@ -35,7 +36,12 @@ export function CartDialog({
   setOpenCart,
   handleGiftsRefetch,
 }: CartDialogProps) {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [giftMethod, setGiftMethod] = useState("shop");
   const [methodSelected, setMethodSelected] = useState("");
+
+  const [shopProductsAccessed, setShopProductsAccessed] = useSessionStorage<string[]>("productsAccessed", []);
 
   const { data, refetch, isLoading } = trpc.giftsRouter.getCartGifts.useQuery({
     ids: giftsSelected,
@@ -45,8 +51,10 @@ export function CartDialog({
 
   const removeGift = (giftId: string) => {
     const giftsFiltered = giftsSelected.filter((id) => id !== giftId);
+    const productFiltered = shopProductsAccessed.filter((id) => id !== giftId);
 
     setGiftsSelected(giftsFiltered);
+    setShopProductsAccessed(productFiltered);
     refetch();
   };
 
@@ -140,14 +148,29 @@ export function CartDialog({
             {methodSelected === "pix" ? (
               <CartPixDesktop totalPrice={totalPrice} setMethodSelected={setMethodSelected} />
             ) : methodSelected === "shop" ? (
-              <CartShopDesktop gifts={data} handleReset={handleShopReset} setMethodSelected={setMethodSelected} />
+              <CartShopDesktop
+                gifts={data}
+                name={name}
+                message={message}
+                giftMethod={giftMethod}
+                shopProductsAccessed={shopProductsAccessed}
+                handleReset={handleShopReset}
+                setMethodSelected={setMethodSelected}
+                setShopProductsAccessed={setShopProductsAccessed}
+              />
             ) : (
               <CartResumeDesktop
                 gifts={data}
                 totalPrice={totalPrice}
+                name={name}
+                message={message}
+                giftMethod={giftMethod}
                 removeGift={removeGift}
                 closeCart={() => setOpenCart(false)}
                 setMethodSelected={setMethodSelected}
+                setName={setName}
+                setMessage={setMessage}
+                setGiftMethod={setGiftMethod}
               />
             )}
           </>

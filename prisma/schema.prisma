@@ -37,4 +37,19 @@ model Gifts {
   favorite Boolean @default(false)
   stock    Int     @default(0)
   link     String
+
+  purchasesIds String[]   @db.ObjectId
+  purchases    Purchase[] @relation(fields: [purchasesIds], references: [id])
+}
+
+model Purchase {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  message    String?
+  giftMethod String
+
+  giftsIds String[] @db.ObjectId
+  gifts    Gifts[]  @relation(fields: [giftsIds], references: [id])
+
+  createdAt DateTime @default(now())
 }
