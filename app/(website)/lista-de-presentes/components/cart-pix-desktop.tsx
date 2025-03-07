@@ -1,21 +1,44 @@
-import { Copy } from "lucide-react";
+import { toast } from "sonner";
 import { useQRCode } from "next-qrcode";
+import { Copy, Loader2 } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 import { Button } from "@/components/ui/button";
 
+import { trpc } from "@/lib/trpc-client";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/stores/use-cart-store";
 
 interface CartPixDesktopProps {
   totalPrice: number;
+  shopProductsAccessed: string[];
+  handleReset: () => void;
+  setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
-// TODO: adicionar responsividade na altura
-
-export function CartPixDesktop({ totalPrice }: CartPixDesktopProps) {
+export function CartPixDesktop({
+  totalPrice,
+  shopProductsAccessed,
+  handleReset,
+  setShopProductsAccessed,
+}: CartPixDesktopProps) {
   const { Canvas } = useQRCode();
 
-  const { setMethodSelected } = useCartStore();
+  const { name, message, giftMethod, setMethodSelected } = useCartStore();
+
+  const { mutate: handleGiftSubmit, isPending } = trpc.giftsRouter.handleGiftSubmit.useMutation({
+    onSuccess: () => {
+      toast.success("Obrigado por nos presentear!");
+
+      handleReset();
+      setShopProductsAccessed([]);
+    },
+    onError: (err) => {
+      toast.error("Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.");
+
+      console.error(err);
+    },
+  });
 
   return (
     <div className="w-full">
@@ -50,8 +73,13 @@ export function CartPixDesktop({ totalPrice }: CartPixDesktopProps) {
           Voltar
         </Button>
 
-        <Button size="lg" className="w-full">
+        <Button
+          onClick={() => handleGiftSubmit({ name, message, giftMethod, ids: shopProductsAccessed })}
+          size="lg"
+          className="w-full"
+        >
           Presentear
+          {isPending && <Loader2 className="animate-spin size-4 mb-0.5" />}
         </Button>
       </div>
     </div>

@@ -147,7 +147,12 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, h
         ) : data && totalPrice && data.length > 0 ? (
           <>
             {methodSelected === "pix" ? (
-              <CartPixDesktop totalPrice={totalPrice} />
+              <CartPixDesktop
+                totalPrice={totalPrice}
+                shopProductsAccessed={shopProductsAccessed}
+                handleReset={handleShopReset}
+                setShopProductsAccessed={setShopProductsAccessed}
+              />
             ) : methodSelected === "shop" ? (
               <CartShopDesktop
                 gifts={data}

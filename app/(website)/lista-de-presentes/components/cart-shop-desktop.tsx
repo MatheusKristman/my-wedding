@@ -26,7 +26,7 @@ export function CartShopDesktop({
 }: CartShopDesktop) {
   const { name, message, giftMethod, setMethodSelected } = useCartStore();
 
-  const { mutate: handleShopSubmit, isPending } = trpc.giftsRouter.handleShopSubmit.useMutation({
+  const { mutate: handleGiftSubmit, isPending } = trpc.giftsRouter.handleGiftSubmit.useMutation({
     onSuccess: () => {
       toast.success("Obrigado por nos presentear!");
 
@@ -60,7 +60,7 @@ export function CartShopDesktop({
         Clique na opção &quot;ir para loja&quot; para comprar o presente
       </h4>
 
-      <ScrollArea className="max-h-[170px] w-full overflow-y-auto mb-9">
+      <ScrollArea className="max-h-[170px] h-full w-full mb-9">
         <div className="w-full h-full flex flex-col gap-4">
           {gifts.map((gift) => (
             <div key={gift.id} className="w-full flex">
@@ -138,7 +138,7 @@ export function CartShopDesktop({
 
         <Button
           onClick={() =>
-            handleShopSubmit({
+            handleGiftSubmit({
               ids: shopProductsAccessed,
               name,
               message,

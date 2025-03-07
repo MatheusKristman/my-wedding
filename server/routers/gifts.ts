@@ -104,7 +104,7 @@ export const giftsRouter = router({
 
       return gifts;
     }),
-  handleShopSubmit: publicProcedure
+  handleGiftSubmit: publicProcedure
     .input(
       z.object({
         ids: z.array(z.string().min(1)),
