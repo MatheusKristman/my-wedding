@@ -2,13 +2,14 @@ import { prisma } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
-    const { name, price, imageUrl } = await req.json();
+    const { name, price, imageUrl, link } = await req.json();
 
     await prisma.gifts.create({
       data: {
         name,
         price,
         imageUrl,
+        link,
       },
     });
 
