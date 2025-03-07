@@ -1,15 +1,14 @@
 import Image from "next/image";
 import { toast } from "sonner";
 import { Gifts } from "@prisma/client";
+import { Dispatch, SetStateAction } from "react";
 import { Loader2, MoveRight } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { formatPrice } from "@/lib/utils";
 import { trpc } from "@/lib/trpc-client";
-import { useSessionStorage } from "@uidotdev/usehooks";
 
 interface CartShopDesktop {
   gifts: Gifts[];
