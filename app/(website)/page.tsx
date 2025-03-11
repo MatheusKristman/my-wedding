@@ -1,44 +1,147 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "motion/react";
 
 export default function Home() {
+  const titleContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const titleItem = {
+    hidden: { opacity: 0, y: 100 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "circOut",
+      },
+    },
+  };
+
   return (
     <main className="w-full px-6 mt-16 flex flex-col gap-12 sm:px-16 lg:container lg:mx-auto lg:flex-row-reverse">
       <div className="w-full flex flex-col items-center gap-24 lg:items-end">
         <div className="w-full flex flex-col items-center gap-12 lg:items-end">
-          <h1 className="font-fonde text-7xl text-center !leading-[80px] sm:text-8xl sm:max-w-sm sm:!leading-[110px] lg:text-right">
-            Matheus & Giselli
-          </h1>
+          <motion.h1
+            variants={titleContainer}
+            initial="hidden"
+            animate="show"
+            className="font-fonde text-7xl text-center !leading-[80px] sm:text-8xl sm:max-w-sm sm:!leading-[110px] lg:text-right"
+          >
+            <span className="whitespace-nowrap">
+              <motion.span variants={titleItem} className="inline-block">
+                M
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                a
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                t
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                h
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                e
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                u
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                s
+              </motion.span>
+            </span>
 
-          <div className="w-full flex flex-col items-center gap-4 lg:items-end">
+            <motion.span variants={titleItem} className="inline-block mx-4">
+              &
+            </motion.span>
+
+            <span className="whitespace-nowrap">
+              <motion.span variants={titleItem} className="inline-block">
+                G
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                i
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                s
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                e
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                l
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                l
+              </motion.span>
+              <motion.span variants={titleItem} className="inline-block">
+                i
+              </motion.span>
+            </span>
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: -100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1, ease: "easeInOut" }}
+            className="w-full flex flex-col items-center gap-4 lg:items-end"
+          >
             <p className="font-rouge-script text-3xl text-center text-secondary lg:text-right lg:max-w-sm">
-              para que o povo veja e saiba, e todos vejam e saibam, que a mão do
-              Senhor fez isso, que o Santo de Israel o criou.
+              para que o povo veja e saiba, e todos vejam e saibam, que a mão do Senhor fez isso, que o Santo de Israel
+              o criou.
             </p>
 
-            <p className="font-rouge-script text-3xl text-center text-secondary">
-              Isaías 41:20
-            </p>
-          </div>
+            <p className="font-rouge-script text-3xl text-center text-secondary">Isaías 41:20</p>
+          </motion.div>
         </div>
 
-        <div className="w-fit flex flex-col">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1.4, ease: "easeInOut" }}
+          className="w-fit flex flex-col"
+        >
           <div className="w-full flex items-center gap-2">
-            <span className="font-fonde text-2xl">Domingo</span>
+            <span className="font-fonde text-2xl lg:text-3xl">Domingo</span>
 
-            <span className="w-full h-[1.5px] bg-primary/15" />
+            <motion.span
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.8, delay: 1.6, ease: "easeInOut" }}
+              className="w-full h-[1.5px] bg-primary/15"
+            />
           </div>
 
-          <span className="font-fonde text-2xl">15 de Junho de 2025</span>
+          <span className="font-fonde text-2xl lg:text-3xl">15 de Junho de 2025</span>
 
           <div className="w-full flex items-center gap-2">
-            <span className="font-fonde text-2xl">5:30pm</span>
+            <span className="font-fonde text-2xl lg:text-3xl">5:30pm</span>
 
-            <span className="w-full h-[1.5px] bg-primary/15" />
+            <motion.span
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.8, delay: 1.6, ease: "easeInOut" }}
+              className="w-full h-[1.5px] bg-primary/15"
+            />
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="relative w-full flex justify-center">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.6, ease: "easeInOut" }}
+        className="relative w-full flex justify-center"
+      >
         <Image
           src="/home-mobile-illustration.png"
           alt="Matheus & Giselli"
@@ -54,7 +157,7 @@ export default function Home() {
           height={1000}
           className="object-contain object-bottom hidden sm:block"
         />
-      </div>
+      </motion.div>
     </main>
   );
 }
