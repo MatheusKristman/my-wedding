@@ -2,9 +2,10 @@
 
 import { z } from "zod";
 import Link from "next/link";
+import { motion } from "motion/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -137,6 +138,28 @@ export default function ConfirmPresencePage() {
     name: "kidsNames",
   });
 
+  const titleContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const titleItem = {
+    hidden: { opacity: 0, y: 100 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "circOut",
+      },
+    },
+  };
+
   useEffect(() => {
     const currentLength = adultFields.length;
 
@@ -212,9 +235,78 @@ export default function ConfirmPresencePage() {
                 Sentiremos sua Falta!
               </h1>
             ) : (
-              <h1 className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px]">
-                Confirme sua Presença
-              </h1>
+              <motion.h1
+                initial="hidden"
+                animate="show"
+                variants={titleContainer}
+                className="font-fonde text-5xl leading-[60px] sm:text-7xl sm:leading-[80px] sm:w-[480px]"
+              >
+                <span className="whitespace-nowrap mr-4">
+                  <motion.span variants={titleItem} className="inline-block">
+                    C
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    o
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    n
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    f
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    i
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    r
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    m
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    e
+                  </motion.span>
+                </span>
+
+                <span className="whitespace-nowrap mr-4">
+                  <motion.span variants={titleItem} className="inline-block">
+                    s
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    u
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    a
+                  </motion.span>
+                </span>
+
+                <span className="whitespace-nowrap">
+                  <motion.span variants={titleItem} className="inline-block">
+                    P
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    r
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    e
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    s
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    e
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    n
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    ç
+                  </motion.span>
+                  <motion.span variants={titleItem} className="inline-block">
+                    a
+                  </motion.span>
+                </span>
+              </motion.h1>
             )}
 
             {!notPresent && (
