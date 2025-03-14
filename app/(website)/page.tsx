@@ -96,11 +96,13 @@ export default function Home() {
             className="w-full flex flex-col items-center gap-4 lg:items-end"
           >
             <p className="font-rouge-script text-3xl text-center text-secondary lg:text-right lg:max-w-sm">
-              para que o povo veja e saiba, e todos vejam e saibam, que a mão do Senhor fez isso, que o Santo de Israel
-              o criou.
+              para que o povo veja e saiba, e todos vejam e saibam, que a mão do
+              Senhor fez isso, que o Santo de Israel o criou.
             </p>
 
-            <p className="font-rouge-script text-3xl text-center text-secondary">Isaías 41:20</p>
+            <p className="font-rouge-script text-3xl text-center text-secondary">
+              Isaías 41:20
+            </p>
           </motion.div>
         </div>
 
@@ -121,7 +123,9 @@ export default function Home() {
             />
           </div>
 
-          <span className="font-fonde text-2xl lg:text-3xl">15 de Junho de 2025</span>
+          <span className="font-fonde text-2xl lg:text-3xl">
+            15 de Junho de 2025
+          </span>
 
           <div className="w-full flex items-center gap-2">
             <span className="font-fonde text-2xl lg:text-3xl">5:30pm</span>

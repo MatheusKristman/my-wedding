@@ -2,6 +2,7 @@ import { toast } from "sonner";
 import { useQRCode } from "next-qrcode";
 import { Copy, Loader2 } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +23,11 @@ export function CartPixDesktop({
   handleReset,
   setShopProductsAccessed,
 }: CartPixDesktopProps) {
+  const emailPix = "gih.galhardo@gmail.com";
+
   const { name, message, giftMethod, setMethodSelected } = useCartStore();
+
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const { Canvas } = useQRCode();
 
@@ -48,13 +53,13 @@ export function CartPixDesktop({
 
       <div className="w-full flex flex-col items-center gap-5 mb-9">
         <div className="relative w-full max-w-64 aspect-square [&_canvas]:!w-full [&_canvas]:!h-full">
-          <Canvas text={"https://github.com/bunlong/next-qrcode"} />
+          <Canvas text={process.env.NEXT_PUBLIC_PIX_QR_CODE!} />
         </div>
 
-        <div className="w-full max-w-64 bg-secondary h-11 px-5 relative flex items-center justify-between">
-          <span className="font-montserrat text-xl text-background font-light uppercase">123.123.123-12</span>
+        <div className="w-full max-w-[350px] bg-secondary h-11 px-5 relative flex items-center justify-between">
+          <span className="font-montserrat text-base text-background font-light uppercase">{emailPix}</span>
 
-          <Button variant="ghost" size="icon" className="text-background">
+          <Button onClick={() => copyToClipboard(emailPix)} variant="ghost" size="icon" className="text-background">
             <Copy />
           </Button>
         </div>
