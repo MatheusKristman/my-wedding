@@ -1,14 +1,20 @@
 import { toast } from "sonner";
 import { useQRCode } from "next-qrcode";
 import { Copy, Loader2 } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 import { Button } from "@/components/ui/button";
 
 import { trpc } from "@/lib/trpc-client";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/stores/use-cart-store";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CartPixMobileProps {
   totalPrice: number;
@@ -23,6 +29,10 @@ export function CartPixMobile({
   handleReset,
   setShopProductsAccessed,
 }: CartPixMobileProps) {
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
+
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const { name, message, giftMethod, setMethodSelected } = useCartStore();
 
   const [, copyToClipboard] = useCopyToClipboard();
@@ -46,6 +56,19 @@ export function CartPixMobile({
       },
     });
 
+  const handleCopy = (pix: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    copyToClipboard(pix);
+    setShowTooltip(true);
+
+    timeoutRef.current = setTimeout(() => {
+      setShowTooltip(false);
+    }, 3000);
+  };
+
   return (
     <div className="relative max-h-[80vh] overflow-y-auto w-full px-6 pt-5 pb-8">
       <h4 className="font-montserrat text-xl font-light text-primary/50 uppercase mb-9">
@@ -62,14 +85,27 @@ export function CartPixMobile({
             {process.env.NEXT_PUBLIC_PIX_EMAIL!}
           </span>
 
-          <Button
-            onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_PIX_EMAIL!)}
-            variant="ghost"
-            size="icon"
-            className="text-background"
-          >
-            <Copy />
-          </Button>
+          <TooltipProvider disableHoverableContent>
+            <Tooltip open={showTooltip} disableHoverableContent>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => handleCopy(process.env.NEXT_PUBLIC_PIX_EMAIL!)}
+                  variant="ghost"
+                  size="icon"
+                  className="text-background"
+                >
+                  <Copy />
+                </Button>
+              </TooltipTrigger>
+
+              <TooltipContent
+                sideOffset={10}
+                className="font-montserrat bg-secondary text-background text-sm font-medium uppercase shadow-none"
+              >
+                <p>Pix copiado!</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
