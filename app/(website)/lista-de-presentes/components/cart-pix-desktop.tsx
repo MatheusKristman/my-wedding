@@ -23,27 +23,28 @@ export function CartPixDesktop({
   handleReset,
   setShopProductsAccessed,
 }: CartPixDesktopProps) {
-  const emailPix = "gih.galhardo@gmail.com";
-
   const { name, message, giftMethod, setMethodSelected } = useCartStore();
 
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { Canvas } = useQRCode();
 
-  const { mutate: handleGiftSubmit, isPending } = trpc.giftsRouter.handleGiftSubmit.useMutation({
-    onSuccess: () => {
-      toast.success("Obrigado por nos presentear!");
+  const { mutate: handleGiftSubmit, isPending } =
+    trpc.giftsRouter.handleGiftSubmit.useMutation({
+      onSuccess: () => {
+        toast.success("Obrigado por nos presentear!");
 
-      handleReset();
-      setShopProductsAccessed([]);
-    },
-    onError: (err) => {
-      toast.error("Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.");
+        handleReset();
+        setShopProductsAccessed([]);
+      },
+      onError: (err) => {
+        toast.error(
+          "Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.",
+        );
 
-      console.error(err);
-    },
-  });
+        console.error(err);
+      },
+    });
 
   return (
     <div className="w-full">
@@ -57,16 +58,25 @@ export function CartPixDesktop({
         </div>
 
         <div className="w-full max-w-[350px] bg-secondary h-11 px-5 relative flex items-center justify-between">
-          <span className="font-montserrat text-base text-background font-light uppercase">{emailPix}</span>
+          <span className="font-montserrat text-base text-background font-light uppercase">
+            {process.env.NEXT_PUBLIC_PIX_EMAIL!}
+          </span>
 
-          <Button onClick={() => copyToClipboard(emailPix)} variant="ghost" size="icon" className="text-background">
+          <Button
+            onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_PIX_EMAIL!)}
+            variant="ghost"
+            size="icon"
+            className="text-background"
+          >
             <Copy />
           </Button>
         </div>
       </div>
 
       <div className="border-t border-primary/35 w-full pt-4 flex items-center justify-between mb-12">
-        <span className="font-montserrat text-xl text-primary font-light uppercase">Total</span>
+        <span className="font-montserrat text-xl text-primary font-light uppercase">
+          Total
+        </span>
 
         <span className="font-montserrat text-xl text-primary font-light uppercase">
           {formatPrice(totalPrice / 100)}
@@ -84,7 +94,14 @@ export function CartPixDesktop({
         </Button>
 
         <Button
-          onClick={() => handleGiftSubmit({ name, message, giftMethod, ids: shopProductsAccessed })}
+          onClick={() =>
+            handleGiftSubmit({
+              name,
+              message,
+              giftMethod,
+              ids: shopProductsAccessed,
+            })
+          }
           size="lg"
           className="w-full uppercase font-light text-base"
         >
