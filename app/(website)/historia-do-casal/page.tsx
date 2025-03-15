@@ -45,7 +45,7 @@ export default function CoupleStory() {
 
         <div className="relative rounded-full overflow-hidden">
           <Image
-            src="/couple-story-illustration.png"
+            src="/couple-story-illustration.JPG"
             alt="História do casal"
             width={620}
             height={1000}
