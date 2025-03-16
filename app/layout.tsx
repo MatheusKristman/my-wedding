@@ -39,8 +39,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}>
-      <body className="antialiased">
+    <html
+      lang="pt-BR"
+      className={`h-full ${fonde.variable} ${montserrat.variable} ${rougeScript.variable}`}
+    >
+      <body className="h-full antialiased">
         <TRPCProvider>
           <NuqsAdapter>
             <Toaster richColors />
