@@ -648,16 +648,14 @@ export default function ConfirmPresencePage() {
                       />
                     </FormControl>
 
+                    {/* TODO: adicionar pagina e links dos termos e politicas */}
                     <FormLabel className="!mt-0 leading-none text-sm text-background font-normal">
                       Declaro que tive acesso, li e concordo com os{" "}
-                      <Link href="/termos-de-uso" className="underline">
+                      <Link href="#" className="underline">
                         Termos de Uso
                       </Link>{" "}
                       e{" "}
-                      <Link
-                        href="/politica-de-privacidade"
-                        className="underline"
-                      >
+                      <Link href="#" className="underline">
                         Política de Privacidade
                       </Link>
                       .

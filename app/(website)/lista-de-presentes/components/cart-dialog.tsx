@@ -13,8 +13,20 @@ import { CartLoadingMobile } from "./cart-loading-mobile";
 import { CartResumeDesktop } from "./cart-resume-desktop";
 import { CartNoItemDesktop } from "./cart-no-item-desktop";
 import { CartLoadingDesktop } from "./cart-loading-desktop";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc-client";
@@ -28,16 +40,26 @@ interface CartDialogProps {
   handleGiftsRefetch: () => void;
 }
 
-export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, handleGiftsRefetch }: CartDialogProps) {
+export function CartDialog({
+  width,
+  openCart,
+  giftsSelected,
+  setGiftsSelected,
+  handleGiftsRefetch,
+}: CartDialogProps) {
   const { methodSelected, setOpenCart, resetCartStore } = useCartStore();
 
-  const [shopProductsAccessed, setShopProductsAccessed] = useSessionStorage<string[]>("productsAccessed", []);
+  const [shopProductsAccessed, setShopProductsAccessed] = useSessionStorage<
+    string[]
+  >("productsAccessed", []);
 
   const { data, refetch, isLoading } = trpc.giftsRouter.getCartGifts.useQuery({
     ids: giftsSelected,
   });
 
-  const totalPrice = data?.map((gift) => gift.price).reduce((acc, curr) => acc + curr, 0);
+  const totalPrice = data
+    ?.map((gift) => gift.price)
+    .reduce((acc, curr) => acc + curr, 0);
 
   useEffect(() => {
     const products = [...shopProductsAccessed];
@@ -82,15 +104,21 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, h
             </span>
           )}
 
-          <span className="hidden lg:block uppercase">
-            {data && data.length > 0 ? (data.length === 1 ? "1 Item" : `${data.length} Items`) : "Carrinho Vazio"}
+          <span className="font-montserrat hidden lg:block uppercase">
+            {data && data.length > 0
+              ? data.length === 1
+                ? "1 Item"
+                : `${data.length} Items`
+              : "Carrinho Vazio"}
           </span>
         </Button>
       </DrawerTrigger>
 
       <DrawerContent className="sm:rounded-none">
         <DrawerHeader className="px-6 pt-6 pb-0">
-          <DrawerTitle className="uppercase font-light text-2xl text-left font-montserrat">Seu carrinho</DrawerTitle>
+          <DrawerTitle className="uppercase font-light text-2xl text-left font-montserrat">
+            Seu carrinho
+          </DrawerTitle>
         </DrawerHeader>
 
         {isLoading ? (
@@ -138,18 +166,28 @@ export function CartDialog({ width, openCart, giftsSelected, setGiftsSelected, h
           )}
 
           <span className="hidden lg:block uppercase">
-            {data && data.length > 0 ? (data.length === 1 ? "1 Item" : `${data.length} Items`) : "Carrinho Vazio"}
+            {data && data.length > 0
+              ? data.length === 1
+                ? "1 Item"
+                : `${data.length} Items`
+              : "Carrinho Vazio"}
           </span>
         </Button>
       </DialogTrigger>
 
       <DialogContent
         className={cn("sm:rounded-none !max-w-3xl", {
-          "!max-w-xl": !data || data.length === 0 || methodSelected === "pix" || methodSelected === "shop",
+          "!max-w-xl":
+            !data ||
+            data.length === 0 ||
+            methodSelected === "pix" ||
+            methodSelected === "shop",
         })}
       >
         <DialogHeader>
-          <DialogTitle className="uppercase font-light text-2xl font-montserrat">Seu carrinho</DialogTitle>
+          <DialogTitle className="uppercase font-light text-2xl font-montserrat">
+            Seu carrinho
+          </DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
