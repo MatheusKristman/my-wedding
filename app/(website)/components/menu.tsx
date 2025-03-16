@@ -20,7 +20,7 @@ export function Menu({ isMenuOpen, handleClose }: MenuProps) {
     >
       <div
         className={cn(
-          "w-full min-h-screen bg-accent px-6 pt-[calc(16px+40px+60px)] pb-4 absolute top-0 left-0 flex flex-col justify-between gap-16 sm:px-16 sm:min-h-fit sm:w-2/3 sm:pb-14 sm:max-w-lg lg:pt-[calc(16px+40px+60px+32px)]",
+          "w-full h-full min-h-full bg-accent px-6 pt-[calc(16px+40px+60px)] pb-4 absolute top-0 left-0 flex flex-col justify-between gap-16 sm:px-16 sm:min-h-fit sm:w-2/3 sm:pb-14 sm:max-w-lg lg:pt-[calc(16px+40px+60px+32px)]",
         )}
       >
         <ul className="flex flex-col gap-5">
