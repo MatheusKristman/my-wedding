@@ -14,7 +14,7 @@ export function Menu({ isMenuOpen, handleClose }: MenuProps) {
   return (
     <div
       className={cn(
-        "w-screen h-screen bg-black/50 absolute top-0 left-0 right-0 bottom-0 hidden",
+        "w-screen h-screen bg-black/50 fixed top-0 left-0 right-0 bottom-0 hidden",
         isMenuOpen && "z-30 motion-preset-fade motion-duration-300 block",
       )}
     >
