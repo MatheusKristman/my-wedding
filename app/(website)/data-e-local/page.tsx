@@ -35,7 +35,7 @@ export default function DateAndLocationPage() {
   };
 
   return (
-    <section className="w-full px-6 mt-16 sm:px-16 lg:container lg:mx-auto">
+    <section className="w-full px-6 mt-16 pb-12 sm:pb-24 sm:px-16 lg:container lg:mx-auto">
       <div className="w-full flex flex-col mb-12">
         <div className="w-full flex items-center justify-between gap-2">
           <motion.span
@@ -268,7 +268,7 @@ export default function DateAndLocationPage() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1, ease: "easeInOut" }}
-        className="w-full aspect-[3/4] border-[1.5px] border-primary/15 mb-24 p-2 sm:aspect-[5/4] lg:aspect-video"
+        className="w-full aspect-[3/4] border-[1.5px] border-primary/15 p-2 sm:aspect-[5/4] lg:aspect-video"
       >
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3662.533904763696!2d-46.39923492371695!3d-23.368895054551434!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce88de6ffa56e1%3A0xe4adcb462c252ca!2sEstrada%20Acacio%20Antonio%20Batista%204814%2C%20Guarulhos%20-%20S%C3%A3o%20Paulo%2C%2C%20Brasil!5e0!3m2!1spt-BR!2sbr!4v1738337674494!5m2!1spt-BR!2sbr"

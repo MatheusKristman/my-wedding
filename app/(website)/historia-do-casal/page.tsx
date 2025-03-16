@@ -27,7 +27,7 @@ export default function CoupleStory() {
   };
 
   return (
-    <section className="w-full px-6 py-12 flex flex-col gap-12 sm:px-16 lg:container lg:mx-auto lg:flex-row-reverse lg:gap-0">
+    <section className="w-full px-6 pt-12 pb-12 flex flex-col gap-12 sm:pb-24 sm:px-16 lg:container lg:mx-auto lg:flex-row-reverse lg:gap-0">
       <div className="w-full relative pt-[17vw] px-2 sm:w-3/4 sm:mx-auto sm:pt-[13vw] md:w-[50%] lg:w-[40%] lg:px-0 lg:pt-[7%] xl:w-[30%] xl:pt-[6%]">
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}

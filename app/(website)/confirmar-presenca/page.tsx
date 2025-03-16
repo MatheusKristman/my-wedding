@@ -218,7 +218,7 @@ export default function ConfirmPresencePage() {
   }
 
   return (
-    <section className="w-full relative mt-16 sm:mt-24">
+    <section className="w-full relative mt-16 pb-12 sm:mt-24 sm:pb-24">
       <Image
         src="/floral.png"
         alt="Flores"
@@ -227,7 +227,7 @@ export default function ConfirmPresencePage() {
         className="object-contain object-center absolute -top-10 -left-10 z-10 lg:left-10"
       />
 
-      <div className="w-full px-6 flex flex-col gap-12 z-20 relative mb-12 sm:px-16 sm:max-w-[600px] sm:mx-auto sm:mb-24 lg:flex-row lg:max-w-[1350px] lg:justify-between">
+      <div className="w-full px-6 flex flex-col gap-12 z-20 relative sm:px-16 sm:max-w-[600px] sm:mx-auto lg:flex-row lg:max-w-[1350px] lg:justify-between">
         <div className="w-full flex flex-col gap-5 lg:w-[465px] lg:min-w-[465px]">
           <div className="w-full relative">
             {notPresent ? (
