@@ -167,14 +167,19 @@ export default function GuestConfirmedPage() {
             </motion.p>
           </div>
 
-          <div className="relative aspect-square w-full max-w-[330px] mx-auto [&_canvas]:!w-full [&_canvas]:!h-full">
+          <a
+            href="https://onelifesocial.page.link/bjqg"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="relative aspect-square w-full max-w-[330px] mx-auto [&_canvas]:!w-full [&_canvas]:!h-full lg:pointer-events-none lg:cursor-default"
+          >
             <Image
               src="/dots-memories-qr-code.jpg"
               alt="Dots Memories"
               fill
               className="object-contain object-center"
             />
-          </div>
+          </a>
 
           <div className="w-full flex flex-col items-center gap-7 sm:flex-row sm:justify-around">
             <motion.a
