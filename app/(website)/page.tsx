@@ -96,12 +96,12 @@ export default function Home() {
             className="w-full flex flex-col items-center gap-4 lg:items-end"
           >
             <p className="font-rouge-script text-3xl text-center text-secondary lg:text-right lg:max-w-sm">
-              para que o povo veja e saiba, e todos vejam e saibam, que a mão do
-              Senhor fez isso, que o Santo de Israel o criou.
+              Uma vez que já não são dois, as um só, que ninguém separe o que
+              Deus uniu.
             </p>
 
             <p className="font-rouge-script text-3xl text-center text-secondary">
-              Isaías 41:20
+              Mateus 19:6
             </p>
           </motion.div>
         </div>
