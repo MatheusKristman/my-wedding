@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -16,13 +16,22 @@ export function Header() {
     setOpen((prev: boolean) => !prev);
   };
 
+  useEffect(() => {
+    if (open) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.documentElement.style.overflow = "unset";
+    }
+  }, [open]);
+
   return (
     <header className="relative w-full px-6 py-4 flex items-center justify-between gap-6 sm:px-16">
       <Button
         variant="ghost"
         className={cn(
           "font-montserrat uppercase text-base text-foreground !px-0 lg:text-xl",
-          open && "z-40 !text-background"
+          open && "z-40 !text-background",
         )}
         onClick={handleOpen}
       >
@@ -30,7 +39,7 @@ export function Header() {
           <span
             className={cn(
               "w-full h-px bg-primary top-0 absolute transition-all duration-300",
-              open && "top-1/2 translate-y-1/2 -rotate-45 bg-background"
+              open && "top-1/2 translate-y-1/2 -rotate-45 bg-background",
             )}
           />
 
@@ -39,7 +48,7 @@ export function Header() {
           <span
             className={cn(
               "w-full h-px bg-primary bottom-0 absolute transition-all duration-300",
-              open && "static translate-y-1/2 rotate-45 bg-background"
+              open && "static translate-y-1/2 rotate-45 bg-background",
             )}
           />
         </div>
@@ -49,10 +58,19 @@ export function Header() {
       <Menu isMenuOpen={open} handleClose={() => setOpen(false)} />
 
       <Link href="/" className="w-20 h-20 relative lg:w-28 lg:h-28">
-        <Image src="/logo.svg" alt="M&G" fill className="object-contain object-center" />
+        <Image
+          src="/logo.svg"
+          alt="M&G"
+          fill
+          className="object-contain object-center"
+        />
       </Link>
 
-      <Button variant="outline" className="hidden font-light sm:flex lg:text-xl lg:px-5 lg:py-2 lg:h-fit" asChild>
+      <Button
+        variant="outline"
+        className="hidden font-light sm:flex lg:text-xl lg:px-5 lg:py-2 lg:h-fit"
+        asChild
+      >
         <Link href="/confirmar-presenca">Presença</Link>
       </Button>
     </header>
