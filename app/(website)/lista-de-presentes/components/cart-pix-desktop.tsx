@@ -18,15 +18,17 @@ import {
 
 interface CartPixDesktopProps {
   totalPrice: number;
-  shopProductsAccessed: string[];
+  pixProductsAccessed: string[];
   handleReset: () => void;
+  setPixProductsAccessed: Dispatch<SetStateAction<string[]>>;
   setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
 export function CartPixDesktop({
   totalPrice,
-  shopProductsAccessed,
+  pixProductsAccessed,
   handleReset,
+  setPixProductsAccessed,
   setShopProductsAccessed,
 }: CartPixDesktopProps) {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -45,6 +47,7 @@ export function CartPixDesktop({
         toast.success("Obrigado por nos presentear!");
 
         handleReset();
+        setPixProductsAccessed([]);
         setShopProductsAccessed([]);
       },
       onError: (err) => {
@@ -135,7 +138,7 @@ export function CartPixDesktop({
               name,
               message,
               giftMethod,
-              ids: shopProductsAccessed,
+              ids: pixProductsAccessed,
             })
           }
           size="lg"

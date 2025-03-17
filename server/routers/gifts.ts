@@ -11,7 +11,7 @@ export const giftsRouter = router({
         page: z.number().nullish(),
         items: z.number(),
         filter: z.string().min(1),
-      })
+      }),
     )
     .query(async (opts) => {
       const { page, items, filter } = opts.input;
@@ -90,7 +90,7 @@ export const giftsRouter = router({
     .input(
       z.object({
         ids: z.array(z.string().min(1)),
-      })
+      }),
     )
     .query(async (opts) => {
       const { ids } = opts.input;
@@ -103,7 +103,9 @@ export const giftsRouter = router({
         },
       });
 
-      return gifts;
+      const hasNoLink = gifts.filter((gift) => !gift.link).length > 0;
+
+      return { gifts, hasNoLink };
     }),
   handleGiftSubmit: publicProcedure
     .input(
@@ -112,7 +114,7 @@ export const giftsRouter = router({
         name: z.string().min(1),
         message: z.string(),
         giftMethod: z.string().min(1),
-      })
+      }),
     )
     .mutation(async (opts) => {
       const { ids, name, message, giftMethod } = opts.input;
@@ -131,7 +133,8 @@ export const giftsRouter = router({
       if (giftWithoutStock.length > 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Um dos items selecionados já foram comprados, recarregue a pagina para ter a lista atualizada!",
+          message:
+            "Um dos items selecionados já foram comprados, recarregue a pagina para ter a lista atualizada!",
         });
       }
 

@@ -16,6 +16,7 @@ interface CartShopMobileProps {
   shopProductsAccessed: string[];
   handleReset: () => void;
   setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
+  setPixProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
 export function CartShopMobile({
@@ -23,22 +24,27 @@ export function CartShopMobile({
   shopProductsAccessed,
   handleReset,
   setShopProductsAccessed,
+  setPixProductsAccessed,
 }: CartShopMobileProps) {
   const { name, message, giftMethod, setMethodSelected } = useCartStore();
 
-  const { mutate: handleGiftSubmit, isPending } = trpc.giftsRouter.handleGiftSubmit.useMutation({
-    onSuccess: () => {
-      toast.success("Obrigado por nos presentear!");
+  const { mutate: handleGiftSubmit, isPending } =
+    trpc.giftsRouter.handleGiftSubmit.useMutation({
+      onSuccess: () => {
+        toast.success("Obrigado por nos presentear!");
 
-      handleReset();
-      setShopProductsAccessed([]);
-    },
-    onError: (err) => {
-      toast.error("Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.");
+        handleReset();
+        setShopProductsAccessed([]);
+        setPixProductsAccessed([]);
+      },
+      onError: (err) => {
+        toast.error(
+          "Ocorreu um erro ao registrar os presentes, tente novamente mais tarde.",
+        );
 
-      console.error(err);
-    },
-  });
+        console.error(err);
+      },
+    });
 
   const handleBack = () => {
     setMethodSelected("");
@@ -71,7 +77,12 @@ export function CartShopMobile({
                   </div>
                 )}
 
-                <Image src={gift.imageUrl} alt={gift.name} fill className="object-cover object-center" />
+                <Image
+                  src={gift.imageUrl}
+                  alt={gift.name}
+                  fill
+                  className="object-cover object-center"
+                />
               </div>
 
               <div className="w-full p-6 bg-secondary flex flex-col justify-between gap-6">
@@ -96,7 +107,7 @@ export function CartShopMobile({
                   asChild
                 >
                   <a
-                    href={gift.link}
+                    href={gift.link!}
                     rel="noreferrer noopener"
                     target="_blank"
                     className="font-montserrat underline text-base text-background uppercase"
@@ -112,18 +123,26 @@ export function CartShopMobile({
       </ScrollArea>
 
       <div className="w-full border border-primary p-5 mb-10">
-        <h5 className="font-montserrat text-xl text-primary font-light uppercase mb-2">Dados de envio</h5>
+        <h5 className="font-montserrat text-xl text-primary font-light uppercase mb-2">
+          Dados de envio
+        </h5>
 
         <div className="flex flex-col gap-1">
           <span className="font-montserrat text-sm text-primary/70 uppercase">
             Rua general porfírio da paz, 1350 - ap 54c
           </span>
 
-          <span className="font-montserrat text-sm text-primary/70 uppercase">Vila bancaria</span>
+          <span className="font-montserrat text-sm text-primary/70 uppercase">
+            Vila bancaria
+          </span>
 
-          <span className="font-montserrat text-sm text-primary/70 uppercase">são Paulo - sp</span>
+          <span className="font-montserrat text-sm text-primary/70 uppercase">
+            são Paulo - sp
+          </span>
 
-          <span className="font-montserrat text-sm text-primary/70 uppercase">03918-000</span>
+          <span className="font-montserrat text-sm text-primary/70 uppercase">
+            03918-000
+          </span>
         </div>
       </div>
 

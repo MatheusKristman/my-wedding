@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Gifts } from "@prisma/client";
 import { ShoppingBagIcon, Trash2, WalletIcon } from "lucide-react";
 
@@ -14,15 +14,36 @@ import { useCartStore } from "@/stores/use-cart-store";
 interface CartResumeDesktopProps {
   gifts: Gifts[];
   totalPrice: number;
+  hasNoLink: boolean;
   removeGift: (id: string) => void;
-  setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
+  setPixProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
-export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProductsAccessed }: CartResumeDesktopProps) {
+export function CartResumeDesktop({
+  gifts,
+  totalPrice,
+  hasNoLink,
+  removeGift,
+  setPixProductsAccessed,
+}: CartResumeDesktopProps) {
   const [error, setError] = useState({ name: "" });
 
-  const { name, message, giftMethod, setMethodSelected, setName, setMessage, setGiftMethod, setOpenCart } =
-    useCartStore();
+  const {
+    name,
+    message,
+    giftMethod,
+    setMethodSelected,
+    setName,
+    setMessage,
+    setGiftMethod,
+    setOpenCart,
+  } = useCartStore();
+
+  useEffect(() => {
+    if (hasNoLink) {
+      setGiftMethod("pix");
+    }
+  }, [hasNoLink, setGiftMethod]);
 
   const handleClose = () => {
     setName("");
@@ -54,7 +75,7 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
       const giftCartIds = gifts.map((gift) => gift.id);
 
       setMethodSelected("pix");
-      setShopProductsAccessed(giftCartIds);
+      setPixProductsAccessed(giftCartIds);
       return;
     }
 
@@ -69,7 +90,12 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
             {gifts.map((gift) => (
               <div key={gift.id} className="w-full flex">
                 <div className="w-1/3 shrink-0 aspect-square relative">
-                  <Image src={gift.imageUrl} alt={gift.name} fill className="object-cover object-center" />
+                  <Image
+                    src={gift.imageUrl}
+                    alt={gift.name}
+                    fill
+                    className="object-cover object-center"
+                  />
                 </div>
 
                 <div className="w-full p-6 bg-secondary flex flex-col justify-between gap-6">
@@ -94,7 +120,9 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
                   >
                     <Trash2 className="text-destructive" size={16} />
 
-                    <span className="text-base text-destructive uppercase">Remover</span>
+                    <span className="text-base text-destructive uppercase">
+                      Remover
+                    </span>
                   </Button>
                 </div>
               </div>
@@ -106,9 +134,13 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
           <div className="w-full h-px bg-primary/35" />
 
           <div className="w-full flex items-center justify-between gap-6">
-            <span className="font-montserrat text-xl font-light uppercase">Total</span>
+            <span className="font-montserrat text-xl font-light uppercase">
+              Total
+            </span>
 
-            <span className="font-montserrat text-xl font-light uppercase">{formatPrice(totalPrice / 100)}</span>
+            <span className="font-montserrat text-xl font-light uppercase">
+              {formatPrice(totalPrice / 100)}
+            </span>
           </div>
         </div>
       </div>
@@ -116,29 +148,43 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
       <div className="w-1/2 h-full flex flex-col justify-between gap-12">
         <div className="w-full flex flex-col gap-8">
           <div className="w-full flex flex-col gap-4">
-            <span className="font-montserrat text-base uppercase">Forma de presentear</span>
+            <span className="font-montserrat text-base uppercase">
+              Forma de presentear
+            </span>
 
-            <div className="w-full flex items-center justify-between gap-6">
-              <Button
-                onClick={() => setGiftMethod("shop")}
-                variant={giftMethod === "shop" ? "default" : "outline"}
-                size="lg"
-                className="w-1/2"
-              >
-                <ShoppingBagIcon strokeWidth={1} size={20} />
-                Na loja
-              </Button>
-
+            {hasNoLink ? (
               <Button
                 onClick={() => setGiftMethod("pix")}
                 variant={giftMethod === "pix" ? "default" : "outline"}
                 size="lg"
-                className="w-1/2"
+                className="w-full"
               >
                 <WalletIcon strokeWidth={1} size={20} />
                 PIX
               </Button>
-            </div>
+            ) : (
+              <div className="w-full flex items-center justify-between gap-6">
+                <Button
+                  onClick={() => setGiftMethod("shop")}
+                  variant={giftMethod === "shop" ? "default" : "outline"}
+                  size="lg"
+                  className="w-1/2"
+                >
+                  <ShoppingBagIcon strokeWidth={1} size={20} />
+                  Na loja
+                </Button>
+
+                <Button
+                  onClick={() => setGiftMethod("pix")}
+                  variant={giftMethod === "pix" ? "default" : "outline"}
+                  size="lg"
+                  className="w-1/2"
+                >
+                  <WalletIcon strokeWidth={1} size={20} />
+                  PIX
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="w-full flex flex-col gap-4">
@@ -147,12 +193,17 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={cn("w-full outline-input text-base", {
-                  "!border-destructive/50 focus-visible:!border-destructive": error.name !== "",
+                  "!border-destructive/50 focus-visible:!border-destructive":
+                    error.name !== "",
                 })}
                 placeholder="NOME"
               />
 
-              {error.name && <span className="font-montserrat text-sm text-destructive">{error.name}</span>}
+              {error.name && (
+                <span className="font-montserrat text-sm text-destructive">
+                  {error.name}
+                </span>
+              )}
             </div>
 
             <Textarea
@@ -165,11 +216,20 @@ export function CartResumeDesktop({ gifts, totalPrice, removeGift, setShopProduc
         </div>
 
         <div className="w-full grid grid-rows-2 gap-4">
-          <Button onClick={handleNext} size="lg" className="uppercase font-light text-base">
+          <Button
+            onClick={handleNext}
+            size="lg"
+            className="uppercase font-light text-base"
+          >
             Continuar
           </Button>
 
-          <Button onClick={handleClose} size="lg" variant="outline" className="uppercase font-light text-base">
+          <Button
+            onClick={handleClose}
+            size="lg"
+            variant="outline"
+            className="uppercase font-light text-base"
+          >
             Adicionar mais itens
           </Button>
         </div>

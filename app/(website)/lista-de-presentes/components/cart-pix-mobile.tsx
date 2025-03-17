@@ -18,15 +18,17 @@ import {
 
 interface CartPixMobileProps {
   totalPrice: number;
-  shopProductsAccessed: string[];
+  pixProductsAccessed: string[];
   handleReset: () => void;
+  setPixProductsAccessed: Dispatch<SetStateAction<string[]>>;
   setShopProductsAccessed: Dispatch<SetStateAction<string[]>>;
 }
 
 export function CartPixMobile({
   totalPrice,
-  shopProductsAccessed,
+  pixProductsAccessed,
   handleReset,
+  setPixProductsAccessed,
   setShopProductsAccessed,
 }: CartPixMobileProps) {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -45,6 +47,7 @@ export function CartPixMobile({
         toast.success("Obrigado por nos presentear!");
 
         handleReset();
+        setPixProductsAccessed([]);
         setShopProductsAccessed([]);
       },
       onError: (err) => {
@@ -126,7 +129,7 @@ export function CartPixMobile({
               name,
               message,
               giftMethod,
-              ids: shopProductsAccessed,
+              ids: pixProductsAccessed,
             })
           }
           size="lg"

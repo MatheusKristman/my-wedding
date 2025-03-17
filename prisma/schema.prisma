@@ -36,7 +36,7 @@ model Gifts {
   imageUrl String
   favorite Boolean @default(false)
   stock    Int     @default(0)
-  link     String
+  link     String?
 
   purchasesIds String[]   @db.ObjectId
   purchases    Purchase[] @relation(fields: [purchasesIds], references: [id])

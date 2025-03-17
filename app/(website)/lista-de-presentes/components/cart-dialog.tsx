@@ -51,34 +51,51 @@ export function CartDialog({
 
   const [shopProductsAccessed, setShopProductsAccessed] = useSessionStorage<
     string[]
-  >("productsAccessed", []);
+  >("shopProductsAccessed", []);
+  const [pixProductsAccessed, setPixProductsAccessed] = useSessionStorage<
+    string[]
+  >("pixProductsAccessed", []);
 
   const { data, refetch, isLoading } = trpc.giftsRouter.getCartGifts.useQuery({
     ids: giftsSelected,
   });
 
-  const totalPrice = data
-    ?.map((gift) => gift.price)
+  const totalPrice = data?.gifts
+    .map((gift) => gift.price)
     .reduce((acc, curr) => acc + curr, 0);
 
   useEffect(() => {
-    const products = [...shopProductsAccessed];
+    const shopProducts = [...shopProductsAccessed];
+    const pixProducts = [...pixProductsAccessed];
 
     for (let i = 0; i < shopProductsAccessed.length; i++) {
       if (!giftsSelected.includes(shopProductsAccessed[i])) {
-        products.filter((product) => product !== shopProductsAccessed[i]);
+        shopProducts.filter((product) => product !== shopProductsAccessed[i]);
       }
     }
 
-    setShopProductsAccessed(products);
+    for (let i = 0; i < pixProductsAccessed.length; i++) {
+      if (!giftsSelected.includes(pixProductsAccessed[i])) {
+        pixProducts.filter((product) => product !== pixProductsAccessed[i]);
+      }
+    }
+
+    setShopProductsAccessed(shopProducts);
+    setPixProductsAccessed(pixProducts);
   }, []);
 
   const removeGift = (giftId: string) => {
     const giftsFiltered = giftsSelected.filter((id) => id !== giftId);
-    const productFiltered = shopProductsAccessed.filter((id) => id !== giftId);
+    const shopProductsFiltered = shopProductsAccessed.filter(
+      (id) => id !== giftId,
+    );
+    const pixProductsFiltered = pixProductsAccessed.filter(
+      (id) => id !== giftId,
+    );
 
     setGiftsSelected(giftsFiltered);
-    setShopProductsAccessed(productFiltered);
+    setShopProductsAccessed(shopProductsFiltered);
+    setPixProductsAccessed(pixProductsFiltered);
     refetch();
   };
 
@@ -98,17 +115,17 @@ export function CartDialog({
         <Button size="lg" className="w-12 lg:w-fit relative">
           <ShoppingCartIcon />
 
-          {data && data.length > 0 && (
+          {data && data.gifts.length > 0 && (
             <span className="absolute size-5 flex items-center justify-center top-0.5 right-0.5 bg-background rounded-full p-1 font-montserrat text-sm text-foreground lg:hidden">
-              {data.length}
+              {data.gifts.length}
             </span>
           )}
 
-          <span className="font-montserrat hidden lg:block uppercase">
-            {data && data.length > 0
-              ? data.length === 1
+          <span className="hidden lg:block uppercase">
+            {data && data.gifts.length > 0
+              ? data.gifts.length === 1
                 ? "1 Item"
-                : `${data.length} Items`
+                : `${data.gifts.length} Items`
               : "Carrinho Vazio"}
           </span>
         </Button>
@@ -123,28 +140,31 @@ export function CartDialog({
 
         {isLoading ? (
           <CartLoadingMobile closeCart={() => setOpenCart(false)} />
-        ) : data && totalPrice && data.length > 0 ? (
+        ) : data && totalPrice && data.gifts.length > 0 ? (
           <>
             {methodSelected === "pix" ? (
               <CartPixMobile
                 totalPrice={totalPrice}
-                shopProductsAccessed={shopProductsAccessed}
+                pixProductsAccessed={pixProductsAccessed}
                 handleReset={handleShopReset}
                 setShopProductsAccessed={setShopProductsAccessed}
+                setPixProductsAccessed={setPixProductsAccessed}
               />
             ) : methodSelected === "shop" ? (
               <CartShopMobile
-                gifts={data}
+                gifts={data.gifts}
                 shopProductsAccessed={shopProductsAccessed}
                 handleReset={handleShopReset}
                 setShopProductsAccessed={setShopProductsAccessed}
+                setPixProductsAccessed={setPixProductsAccessed}
               />
             ) : (
               <CartResumeMobile
-                gifts={data}
+                gifts={data.gifts}
                 totalPrice={totalPrice}
+                hasNoLink={data.hasNoLink}
                 removeGift={removeGift}
-                setShopProductsAccessed={setShopProductsAccessed}
+                setPixProductsAccessed={setPixProductsAccessed}
               />
             )}
           </>
@@ -159,17 +179,17 @@ export function CartDialog({
         <Button size="lg" className="w-12 lg:w-fit relative">
           <ShoppingCartIcon />
 
-          {data && data.length > 0 && (
+          {data && data.gifts.length > 0 && (
             <span className="absolute size-5 flex items-center justify-center top-0.5 right-0.5 bg-background rounded-full p-1 font-montserrat text-sm text-foreground lg:hidden">
-              {data.length}
+              {data.gifts.length}
             </span>
           )}
 
           <span className="hidden lg:block uppercase">
-            {data && data.length > 0
-              ? data.length === 1
+            {data && data.gifts.length > 0
+              ? data.gifts.length === 1
                 ? "1 Item"
-                : `${data.length} Items`
+                : `${data.gifts.length} Items`
               : "Carrinho Vazio"}
           </span>
         </Button>
@@ -179,7 +199,7 @@ export function CartDialog({
         className={cn("sm:rounded-none !max-w-3xl", {
           "!max-w-xl":
             !data ||
-            data.length === 0 ||
+            data.gifts.length === 0 ||
             methodSelected === "pix" ||
             methodSelected === "shop",
         })}
@@ -192,28 +212,31 @@ export function CartDialog({
 
         {isLoading ? (
           <CartLoadingDesktop closeCart={() => setOpenCart(false)} />
-        ) : data && totalPrice && data.length > 0 ? (
+        ) : data && totalPrice && data.gifts.length > 0 ? (
           <>
             {methodSelected === "pix" ? (
               <CartPixDesktop
                 totalPrice={totalPrice}
-                shopProductsAccessed={shopProductsAccessed}
+                pixProductsAccessed={pixProductsAccessed}
                 handleReset={handleShopReset}
+                setPixProductsAccessed={setPixProductsAccessed}
                 setShopProductsAccessed={setShopProductsAccessed}
               />
             ) : methodSelected === "shop" ? (
               <CartShopDesktop
-                gifts={data}
+                gifts={data.gifts}
                 shopProductsAccessed={shopProductsAccessed}
                 handleReset={handleShopReset}
                 setShopProductsAccessed={setShopProductsAccessed}
+                setPixProductsAccessed={setPixProductsAccessed}
               />
             ) : (
               <CartResumeDesktop
-                gifts={data}
+                gifts={data.gifts}
                 totalPrice={totalPrice}
+                hasNoLink={data.hasNoLink}
                 removeGift={removeGift}
-                setShopProductsAccessed={setShopProductsAccessed}
+                setPixProductsAccessed={setPixProductsAccessed}
               />
             )}
           </>
