@@ -96,13 +96,10 @@ export default function Home() {
             className="w-full flex flex-col items-center gap-4 lg:items-end"
           >
             <p className="font-rouge-script text-3xl text-center text-secondary lg:text-right lg:max-w-sm">
-              Uma vez que já não são dois, as um só, que ninguém separe o que
-              Deus uniu.
+              Assim, eles já não são dois, mas sim uma só carne. Portanto, ninguém separe o que Deus uniu.
             </p>
 
-            <p className="font-rouge-script text-3xl text-center text-secondary">
-              Mateus 19:6
-            </p>
+            <p className="font-rouge-script text-3xl text-center text-secondary">Mateus 19:6</p>
           </motion.div>
         </div>
 
@@ -123,9 +120,7 @@ export default function Home() {
             />
           </div>
 
-          <span className="font-fonde text-2xl lg:text-3xl">
-            15 de Junho de 2025
-          </span>
+          <span className="font-fonde text-2xl lg:text-3xl">15 de Junho de 2025</span>
 
           <div className="w-full flex items-center gap-2">
             <span className="font-fonde text-2xl lg:text-3xl">5:30pm</span>
