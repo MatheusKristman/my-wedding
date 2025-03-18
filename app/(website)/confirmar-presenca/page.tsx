@@ -4,7 +4,7 @@ import { z } from "zod";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Input } from "@/components/ui/input";
@@ -12,88 +12,87 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import Image from "next/image";
 import { trpc } from "@/lib/trpc-client";
 import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(1, "O nome é obrigatório")
-    .includes(" ", { message: "É preciso inserir o sobrenome" })
-    .min(6, "O nome precisa ter no mínimo 6 caracteres")
-    .max(100, "O nome só pode ter no máximo 100 caracteres"),
-  attend: z.enum(["yes", "no"], {
-    required_error: "Você precisa selecionar uma das opções",
-  }),
-  adultQuantity: z.string().min(1, "É preciso ter ao menos 1 adulto"),
-  adultNames: z
-    .array(
+const formSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, "O nome é obrigatório")
+      .includes(" ", { message: "É preciso inserir o sobrenome" })
+      .min(6, "O nome precisa ter no mínimo 6 caracteres")
+      .max(100, "O nome só pode ter no máximo 100 caracteres"),
+    attend: z.enum(["yes", "no"], {
+      required_error: "Você precisa selecionar uma das opções",
+    }),
+    adultQuantity: z.string().min(1, "É preciso ter ao menos 1 adulto"),
+    adultNames: z.array(
       z.object({
         value: z
           .string()
           .includes(" ", { message: "É preciso inserir o sobrenome" })
           .min(6, "O nome precisa ter no mínimo 6 caracteres")
           .max(100, "O nome só pode ter no máximo 100 caracteres"),
-      }),
-    )
-    .refine(
-      (data) => {
-        const values = data.map((item) => item.value);
-        const uniqueValues = new Set(values);
-
-        return uniqueValues.size === values.length;
-      },
-      {
-        message: "Os nomes não podem ser repetidos",
-      },
+      })
     ),
-  kidsQuantity: z.string().optional(),
-  kidsNames: z
-    .array(
-      z.object({
-        value: z
-          .string()
-          .includes(" ", { message: "É preciso inserir o sobrenome" })
-          .min(6, "O nome precisa ter no mínimo 6 caracteres")
-          .max(100, "O nome só pode ter no máximo 100 caracteres"),
-      }),
-    )
-    .refine(
-      (data) => {
-        const values = data.map((item) => item.value);
-        const uniqueValues = new Set(values);
+    kidsQuantity: z.string().optional(),
+    kidsNames: z
+      .array(
+        z.object({
+          value: z
+            .string()
+            .includes(" ", { message: "É preciso inserir o sobrenome" })
+            .min(6, "O nome precisa ter no mínimo 6 caracteres")
+            .max(100, "O nome só pode ter no máximo 100 caracteres"),
+        })
+      )
+      .optional(),
+    email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
+    tel: z.string().min(1, "Telefone é obrigatório").length(15, "Telefone inválido"),
+    message: z.string(),
+    termsCheck: z.boolean().default(false),
+  })
+  .superRefine(({ kidsNames, adultNames, name }, ctx) => {
+    if (kidsNames !== undefined) {
+      const kids = kidsNames.map((item) => item.value);
+      const uniqueValues = new Set(kids);
 
-        return uniqueValues.size === values.length;
-      },
-      {
+      if (uniqueValues.size !== kids.length) {
+        ctx.addIssue({
+          message: "Os nomes não podem ser repetidos",
+          path: ["kidsQuantity"],
+          code: "custom",
+        });
+      }
+    }
+
+    const hasName = adultNames.map((item) => item.value).includes(name);
+
+    if (hasName) {
+      ctx.addIssue({
+        message: "Os nomes não podem ser o mesmo do convidado primário",
+        path: ["adultQuantity"],
+        code: "custom",
+      });
+
+      return;
+    }
+
+    const adults = adultNames.map((item) => item.value);
+    const uniqueValues = new Set(adults);
+
+    if (uniqueValues.size !== adults.length) {
+      ctx.addIssue({
         message: "Os nomes não podem ser repetidos",
-      },
-    )
-    .optional(),
-  email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
-  tel: z
-    .string()
-    .min(1, "Telefone é obrigatório")
-    .length(15, "Telefone inválido"),
-  message: z.string(),
-  termsCheck: z.boolean().default(false),
-});
+        path: ["adultQuantity"],
+        code: "custom",
+      });
+    }
+  });
 
 export default function ConfirmPresencePage() {
   const [notPresent, setNotPresent] = useState(false);
@@ -119,6 +118,7 @@ export default function ConfirmPresencePage() {
   const termsCheck = form.watch("termsCheck");
 
   const router = useRouter();
+  const kidsInputRef = useRef<HTMLLabelElement | null>(null);
 
   const {
     fields: adultFields,
@@ -161,6 +161,10 @@ export default function ConfirmPresencePage() {
   };
 
   useEffect(() => {
+    console.log({ errors: form.formState.errors });
+  }, [form.formState.errors]);
+
+  useEffect(() => {
     const currentLength = adultFields.length;
 
     if (adultQuantity > currentLength) {
@@ -188,20 +192,19 @@ export default function ConfirmPresencePage() {
     }
   }, [kidsQuantity]);
 
-  const { mutate: registerGuest, isPending } =
-    trpc.guestRouter.registerGuest.useMutation({
-      onSuccess: ({ attend }) => {
-        if (attend) {
-          router.push("/confirmar-presenca/confirmado");
-        } else {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          setNotPresent(true);
-        }
-      },
-      onError: (error) => {
-        console.log({ error });
-      },
-    });
+  const { mutate: registerGuest, isPending } = trpc.guestRouter.registerGuest.useMutation({
+    onSuccess: ({ attend }) => {
+      if (attend) {
+        router.push("/confirmar-presenca/confirmado");
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setNotPresent(true);
+      }
+    },
+    onError: (error) => {
+      console.log({ error });
+    },
+  });
 
   function handleTel(event: ChangeEvent<HTMLInputElement>) {
     let value = event.target.value.replace(/[^\d]/g, "");
@@ -212,6 +215,10 @@ export default function ConfirmPresencePage() {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    if (form.formState.errors.kidsQuantity !== undefined) {
+      kidsInputRef.current?.scroll({ top: 0, behavior: "smooth" });
+    }
+
     if (termsCheck) {
       registerGuest(values);
     }
@@ -324,8 +331,8 @@ export default function ConfirmPresencePage() {
 
           {notPresent && (
             <p className="font-montserrat text-2xl font-light text-secondary">
-              Entendemos que nem sempre é possível estar presente, mas saiba que
-              sentiremos muito a sua falta nesse dia especial.
+              Entendemos que nem sempre é possível estar presente, mas saiba que sentiremos muito a sua falta nesse dia
+              especial.
             </p>
           )}
         </div>
@@ -341,9 +348,7 @@ export default function ConfirmPresencePage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">
-                      Nome Completo
-                    </FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">Nome Completo</FormLabel>
 
                     <FormControl>
                       <Input
@@ -364,9 +369,7 @@ export default function ConfirmPresencePage() {
                 name="attend"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">
-                      Você irá ao evento?
-                    </FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">Você irá ao evento?</FormLabel>
 
                     <FormControl>
                       <RadioGroup
@@ -380,9 +383,7 @@ export default function ConfirmPresencePage() {
                             <RadioGroupItem value="yes" />
                           </FormControl>
 
-                          <FormLabel className="!mt-0.5 font-light text-base text-background">
-                            Sim
-                          </FormLabel>
+                          <FormLabel className="!mt-0.5 font-light text-base text-background">Sim</FormLabel>
                         </FormItem>
 
                         <FormItem className="flex items-center gap-2">
@@ -390,9 +391,7 @@ export default function ConfirmPresencePage() {
                             <RadioGroupItem value="no" />
                           </FormControl>
 
-                          <FormLabel className="!mt-0.5 font-light text-base text-background">
-                            Não
-                          </FormLabel>
+                          <FormLabel className="!mt-0.5 font-light text-base text-background">Não</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -411,13 +410,13 @@ export default function ConfirmPresencePage() {
                       Quantidade de adultos (incluindo você)
                     </FormLabel>
 
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={notPresent}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={notPresent}>
                       <FormControl>
-                        <SelectTrigger className="bg-primary border-background text-background normal-case">
+                        <SelectTrigger
+                          className="bg-primary border-background text-background normal-case"
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                        >
                           <SelectValue placeholder="Selecione a quantidade de adultos" />
                         </SelectTrigger>
                       </FormControl>
@@ -470,14 +469,8 @@ export default function ConfirmPresencePage() {
                           />
                         </FormControl>
 
-                        {form.formState.errors?.adultNames?.[index]?.value
-                          ?.message && (
-                          <FormMessage>
-                            {
-                              form.formState.errors?.adultNames?.[index]?.value
-                                ?.message
-                            }
-                          </FormMessage>
+                        {form.formState.errors?.adultNames?.[index]?.value?.message && (
+                          <FormMessage>{form.formState.errors?.adultNames?.[index]?.value?.message}</FormMessage>
                         )}
                       </FormItem>
                     )}
@@ -489,17 +482,17 @@ export default function ConfirmPresencePage() {
                 name="kidsQuantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">
+                    <FormLabel ref={kidsInputRef} className="text-lg text-background font-semibold">
                       Quantidade de crianças (0 - X anos)
                     </FormLabel>
 
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={notPresent}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={notPresent}>
                       <FormControl>
-                        <SelectTrigger className="bg-primary border-background text-background normal-case">
+                        <SelectTrigger
+                          className="bg-primary border-background text-background normal-case"
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                        >
                           <SelectValue placeholder="Selecione a quantidade de crianças" />
                         </SelectTrigger>
                       </FormControl>
@@ -554,14 +547,8 @@ export default function ConfirmPresencePage() {
                           />
                         </FormControl>
 
-                        {form.formState.errors?.kidsNames?.[index]?.value
-                          ?.message && (
-                          <FormMessage>
-                            {
-                              form.formState.errors?.kidsNames?.[index]?.value
-                                ?.message
-                            }
-                          </FormMessage>
+                        {form.formState.errors?.kidsNames?.[index]?.value?.message && (
+                          <FormMessage>{form.formState.errors?.kidsNames?.[index]?.value?.message}</FormMessage>
                         )}
                       </FormItem>
                     )}
@@ -572,9 +559,7 @@ export default function ConfirmPresencePage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">
-                      E-mail
-                    </FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">E-mail</FormLabel>
 
                     <FormControl>
                       <Input
@@ -594,9 +579,7 @@ export default function ConfirmPresencePage() {
                 name="tel"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">
-                      Telefone para contato
-                    </FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">Telefone para contato</FormLabel>
 
                     <FormControl>
                       <Input
@@ -618,9 +601,7 @@ export default function ConfirmPresencePage() {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg text-background font-semibold">
-                      Mensagem
-                    </FormLabel>
+                    <FormLabel className="text-lg text-background font-semibold">Mensagem</FormLabel>
 
                     <FormControl>
                       <Textarea
@@ -641,11 +622,7 @@ export default function ConfirmPresencePage() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start gap-2">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={notPresent}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={notPresent} />
                     </FormControl>
 
                     {/* TODO: adicionar pagina e links dos termos e politicas */}
@@ -667,11 +644,7 @@ export default function ConfirmPresencePage() {
               />
             </div>
 
-            <Button
-              variant="light"
-              type="submit"
-              disabled={!termsCheck || isPending || notPresent}
-            >
+            <Button variant="light" type="submit" disabled={!termsCheck || isPending || notPresent}>
               Confirmar Presença
             </Button>
           </form>
