@@ -659,7 +659,7 @@ export default function ConfirmPresencePage() {
 
                     <FormControl>
                       <Textarea
-                        placeholder="Insira o telefone"
+                        placeholder="Insira a sua mensagem"
                         className="dark-input w-full !h-40 resize-none"
                         disabled={notPresent}
                         {...field}
