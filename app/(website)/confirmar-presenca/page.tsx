@@ -486,7 +486,7 @@ export default function ConfirmPresencePage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-lg text-background font-semibold">
-                          Nome do adulto - {index + 1}
+                          Acompanhante - {index + 1}
                         </FormLabel>
 
                         <FormControl>
