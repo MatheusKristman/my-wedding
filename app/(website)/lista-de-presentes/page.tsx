@@ -7,7 +7,7 @@ import { useWindowSize, useSessionStorage } from "@uidotdev/usehooks";
 
 import { GiftItem } from "./components/gift-item";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CartDialog } from "./components/cart-dialog";
+import { CartDialog } from "./components/cart/cart-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Pagination,
