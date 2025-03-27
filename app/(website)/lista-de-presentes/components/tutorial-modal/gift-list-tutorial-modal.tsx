@@ -30,7 +30,7 @@ export function GiftListTutorialModal() {
 
   useEffect(() => {
     if (boxRef.current) {
-      boxRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      boxRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [currentStep]);
 
@@ -41,8 +41,8 @@ export function GiftListTutorialModal() {
           <DialogTitle>Lista de Presentes - Tutorial</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea ref={boxRef} className="w-full max-h-[600px]">
-          <div className="w-full flex flex-col justify-between gap-12">
+        <ScrollArea className="w-full  max-h-[400px] lg:max-h-[600px]">
+          <div ref={boxRef} className="w-full flex flex-col justify-between gap-12">
             <AnimatePresence mode="wait" initial={false}>
               {currentStep === 0 && <FirstStep key="first-step" />}
               {currentStep === 1 && <SecondStep key="second-step" />}

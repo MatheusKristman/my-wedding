@@ -9,9 +9,11 @@ export function FirstStep() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.h1 className="font-fonde text-4xl text-center max-w-sm">Bem-vindo à nossa Lista de Presentes!</motion.h1>
+      <motion.h1 className="font-fonde text-2xl md:text-4xl text-center max-w-[250px] md:max-w-sm">
+        Bem-vindo à nossa Lista de Presentes!
+      </motion.h1>
 
-      <p className="font-montserrat text-center text-xl text-primary/50 font-light uppercase leading-relaxed">
+      <p className="font-montserrat text-center text-sm sm:text-xl text-primary/50 font-light uppercase leading-relaxed">
         Para facilitar sua experiência, siga o passo a passo abaixo para entender como funciona a lista de presentes.
       </p>
     </motion.div>

@@ -10,8 +10,8 @@ export function SecondStep() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="relative w-full aspect-video">
-        <Image src="/second-step.png" alt="Adicionando itens ao carrinho" fill />
+      <div className="relative w-full aspect-[16/12]">
+        <Image src="/second-step.png" alt="Adicionando itens ao carrinho" fill className="object-cover" />
       </div>
 
       <div className="w-full px-6 flex flex-col gap-5">
